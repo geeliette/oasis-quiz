@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local dev fallback database (used only when no Redis env vars are set)
+/.data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
