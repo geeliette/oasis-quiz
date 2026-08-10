@@ -2,6 +2,7 @@ export interface Clue {
   id: string;
   value: number;
   question: string;
+  hint?: string;
   answer: string;
   revealed: boolean;
   answered: boolean;

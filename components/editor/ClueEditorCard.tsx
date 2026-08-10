@@ -7,7 +7,7 @@ import type { FieldErrors } from "@/lib/validation";
 interface ClueEditorCardProps {
   clue: Clue;
   errors: FieldErrors;
-  onChange: (field: "value" | "question" | "answer", value: string) => void;
+  onChange: (field: "value" | "question" | "hint" | "answer", value: string) => void;
   onRemove: () => void;
 }
 
@@ -55,6 +55,18 @@ export function ClueEditorCard({ clue, errors, onChange, onRemove }: ClueEditorC
           className="text-sm"
         />
         <FieldError>{errors[`clue.${clue.id}.question`]}</FieldError>
+      </div>
+
+      <div>
+        <TextArea
+          value={clue.hint ?? ""}
+          onChange={(e) => onChange("hint", e.target.value)}
+          placeholder="Clue to show before the answer, if no one guesses (optional)…"
+          rows={2}
+          error={errors[`clue.${clue.id}.hint`]}
+          className="text-sm"
+        />
+        <FieldError>{errors[`clue.${clue.id}.hint`]}</FieldError>
       </div>
 
       <div>

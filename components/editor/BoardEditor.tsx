@@ -68,7 +68,7 @@ export function BoardEditor({ initialGame }: { initialGame: Game }) {
   function updateClue(
     catId: string,
     clueId: string,
-    field: "value" | "question" | "answer",
+    field: "value" | "question" | "hint" | "answer",
     value: string
   ) {
     setCategories((cs) =>

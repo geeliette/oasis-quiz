@@ -13,7 +13,11 @@ interface CategoryColumnProps {
   onRemoveCategory: () => void;
   onAddClue: () => void;
   onRemoveClue: (clueId: string) => void;
-  onClueChange: (clueId: string, field: "value" | "question" | "answer", value: string) => void;
+  onClueChange: (
+    clueId: string,
+    field: "value" | "question" | "hint" | "answer",
+    value: string
+  ) => void;
 }
 
 const ACCENTS = ["#DC2626", "#FB7185", "#2DD4BF", "#38BDF8", "#FBBF24", "#22C55E"];

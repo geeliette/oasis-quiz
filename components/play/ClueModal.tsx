@@ -24,6 +24,8 @@ export function ClueModal({
   onReset,
 }: ClueModalProps) {
   const [phase, setPhase] = useState<"question" | "answer">("question");
+  const [hintShown, setHintShown] = useState(false);
+  const hasHint = !!clue.hint?.trim();
 
   function handleExit() {
     if (phase === "question") {
@@ -33,11 +35,20 @@ export function ClueModal({
     }
   }
 
+  function advance() {
+    if (phase !== "question") return;
+    if (hasHint && !hintShown) {
+      setHintShown(true);
+    } else {
+      setPhase("answer");
+    }
+  }
+
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.code === "Space" || e.code === "Enter") {
         e.preventDefault();
-        setPhase((p) => (p === "question" ? "answer" : p));
+        advance();
       } else if (e.code === "Escape") {
         e.preventDefault();
         handleExit();
@@ -46,7 +57,7 @@ export function ClueModal({
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]);
+  }, [phase, hintShown]);
 
   return (
     <AnimatePresence>
@@ -99,26 +110,50 @@ export function ClueModal({
             style={{ transformStyle: "preserve-3d" }}
             animate={{ rotateY: phase === "answer" ? 180 : 0 }}
             transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
-            onClick={() => phase === "question" && setPhase("answer")}
+            onClick={advance}
           >
             {/* Front: question */}
-            <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center gap-8 rounded-[2rem] border border-white/10 bg-gradient-to-br from-[var(--color-tile-start)] to-[var(--color-tile-end)] p-8 text-center shadow-[var(--shadow-pop)] sm:p-14">
+            <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center gap-6 rounded-[2rem] border border-white/10 bg-gradient-to-br from-[var(--color-tile-start)] to-[var(--color-tile-end)] p-8 text-center shadow-[var(--shadow-pop)] sm:p-14">
               <span className="rounded-full bg-white/15 px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide text-white/90">
                 {category.name} · {clue.value} pts
               </span>
-              <p className="font-display text-2xl font-bold leading-snug text-white sm:text-4xl">
+              <p className="whitespace-pre-line font-display text-2xl font-bold leading-snug text-white sm:text-4xl">
                 {clue.question}
               </p>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPhase("answer");
-                }}
-                className="rounded-2xl bg-accent px-6 py-3 font-display font-bold text-[#3a2600] shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Reveal Answer
-              </button>
+              {hintShown && hasHint && (
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="rounded-full bg-accent/20 px-3 py-1 font-display text-xs font-bold uppercase tracking-wide text-accent">
+                    Clue
+                  </span>
+                  <p className="whitespace-pre-line text-lg font-medium leading-snug text-white/85 sm:text-xl">
+                    {clue.hint}
+                  </p>
+                </div>
+              )}
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                {hasHint && !hintShown && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setHintShown(true);
+                    }}
+                    className="rounded-2xl bg-white/15 px-6 py-3 font-display font-bold text-white shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-transform hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    Show Clue
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPhase("answer");
+                  }}
+                  className="rounded-2xl bg-accent px-6 py-3 font-display font-bold text-[#3a2600] shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-transform hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  Reveal Answer
+                </button>
+              </div>
               <span className="text-xs font-medium text-white/50">
                 Press space or click the card
               </span>
@@ -133,7 +168,7 @@ export function ClueModal({
               <span className="rounded-full bg-accent/20 px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide text-accent">
                 Answer
               </span>
-              <p className="font-display text-xl font-bold leading-snug text-white sm:text-3xl">
+              <p className="whitespace-pre-line font-display text-xl font-bold leading-snug text-white sm:text-3xl">
                 {clue.answer}
               </p>
 
