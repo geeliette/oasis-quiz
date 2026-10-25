@@ -52,6 +52,8 @@ Clue { id, value, question, answer, revealed, answered }
 Team { id, name, color, score }
 ```
 
+Games expire automatically (Redis TTL, set in `lib/expiry.ts`): 90 days after they were last saved or opened, or 7 days for boards that were never filled in. New boards and demo copies aren't stored until their first edit.
+
 ## Seed data
 
 The demo board (`/game/demo`) is built from `lib/demo.ts` on every request and is never saved, so each visitor sees the original board — play progress resets on reload and nobody can change it for others. Clicking **Edit a copy** on the demo saves a personal copy under a new id and opens it in the editor.

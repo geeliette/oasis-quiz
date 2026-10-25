@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Category, Game } from "@/lib/types";
 import { blankCategoryFactory, blankClue } from "@/lib/blank";
+import { ACTIVE_BOARD_TTL_DAYS } from "@/lib/expiry";
 import { validateGame, isReadyToPlay } from "@/lib/validation";
 import { useAutosaveGame } from "@/hooks/useAutosaveGame";
 import { CopyLinkField } from "@/components/ui/CopyLinkField";
@@ -144,6 +145,11 @@ export function BoardEditor({ initialGame }: { initialGame: Game }) {
         <div className="mx-auto mt-3 max-w-[1500px] lg:hidden">
           <CopyLinkField url={playUrl} />
         </div>
+
+        <p className="mx-auto mt-2 max-w-[1500px] text-xs text-ink-faint">
+          Save the link to come back to this board. Boards are deleted after{" "}
+          {ACTIVE_BOARD_TTL_DAYS} days without use.
+        </p>
       </header>
 
       <main className="flex-1 px-4 py-6 sm:px-6">

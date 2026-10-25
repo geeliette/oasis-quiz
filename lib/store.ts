@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { Redis } from "@upstash/redis";
 import { DEMO_GAME_ID, buildDemoGame } from "./demo";
+import { ttlSecondsFor } from "./expiry";
 import type { Game } from "./types";
 
 const REDIS_URL =
@@ -51,7 +52,10 @@ export async function getGame(id: string): Promise<Game | null> {
   assertPersistenceAvailable();
   if (redis) {
     const game = await redis.get<Game>(`game:${id}`);
-    return game ?? null;
+    if (!game) return null;
+    // Opening a board counts as using it, so push its expiry back.
+    await redis.expire(`game:${id}`, ttlSecondsFor(game));
+    return game;
   }
   const all = await readFileStore();
   return all[id] ?? null;
@@ -61,7 +65,7 @@ export async function saveGame(game: Game): Promise<void> {
   if (game.id === DEMO_GAME_ID) return;
   assertPersistenceAvailable();
   if (redis) {
-    await redis.set(`game:${game.id}`, game);
+    await redis.set(`game:${game.id}`, game, { ex: ttlSecondsFor(game) });
     return;
   }
   const all = await readFileStore();

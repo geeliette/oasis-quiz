@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { buildBlankGame } from "@/lib/blank";
 import { DEMO_GAME_ID, buildDemoGame } from "@/lib/demo";
 import { newGameId } from "@/lib/id";
-import { getGame, saveGame } from "@/lib/store";
+import { getGame } from "@/lib/store";
 import { BoardEditor } from "@/components/editor/BoardEditor";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -18,19 +18,8 @@ export default async function EditGamePage({ params, searchParams }: PageProps) 
   const { new: isNewFlag } = await searchParams;
 
   // The demo can't be edited in place, so editing it starts a personal copy.
-  // redirect() throws, so it has to run outside the try/catch below.
-  let copyId: string | null = null;
-
-  try {
-    if (id === DEMO_GAME_ID) {
-      copyId = newGameId();
-      await saveGame({ ...buildDemoGame(), id: copyId });
-    }
-  } catch (err) {
-    return <DatabaseError err={err} />;
-  }
-
-  if (copyId) redirect(`/game/${copyId}/edit`);
+  // Like a new board, the copy is only saved once something is changed.
+  if (id === DEMO_GAME_ID) redirect(`/game/${newGameId()}/edit?new=demo`);
 
   try {
     let game = await getGame(id);
@@ -38,6 +27,8 @@ export default async function EditGamePage({ params, searchParams }: PageProps) 
     if (!game) {
       if (isNewFlag === "1") {
         game = buildBlankGame(id);
+      } else if (isNewFlag === "demo") {
+        game = { ...buildDemoGame(), id };
       } else {
         return (
           <div className="mx-auto flex w-full max-w-2xl flex-1 items-center px-6 py-24">
