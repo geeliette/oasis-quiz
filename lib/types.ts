@@ -11,6 +11,8 @@ export interface Clue {
 export interface Category {
   id: string;
   name: string;
+  /** Sticker colour; boards saved before this existed fall back to one by position. */
+  color?: string;
   clues: Clue[];
 }
 

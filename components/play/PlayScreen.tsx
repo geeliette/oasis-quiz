@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Category, Game, Team } from "@/lib/types";
 import { newId } from "@/lib/id";
-import { categoryColor, nextTeamColor } from "./teamColors";
+import { nextTeamColor, resolveCategoryColor } from "./teamColors";
 import { useAutosaveGame } from "@/hooks/useAutosaveGame";
 import { SaveStatusIndicator } from "@/components/ui/SaveStatus";
 import { Button } from "@/components/ui/Button";
@@ -254,7 +254,7 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
       {activeClue && activeCategory && (
         <ClueModal
           category={activeCategory}
-          categoryColor={categoryColor(categories.indexOf(activeCategory))}
+          categoryColor={resolveCategoryColor(activeCategory, categories.indexOf(activeCategory))}
           clue={activeClue}
           teams={teams}
           onAward={handleAward}

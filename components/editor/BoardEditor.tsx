@@ -3,6 +3,21 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
 import type { Category, Game } from "@/lib/types";
 import { blankCategoryFactory, blankClue } from "@/lib/blank";
 import { ACTIVE_BOARD_TTL_DAYS } from "@/lib/expiry";
@@ -16,10 +31,23 @@ import { FieldError } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { EmptyBoardIcon } from "@/components/ui/Icons";
 import { LogoMark } from "@/components/ui/Logo";
+import { CATEGORY_COLORS, resolveCategoryColor } from "@/components/play/teamColors";
 import { CategoryColumn } from "./CategoryColumn";
 
 function noopSubscribe() {
   return () => {};
+}
+
+// Pin every category's colour so it stays put when categories are reordered
+// (older boards only have a colour implied by position).
+function withColors(categories: Category[]): Category[] {
+  return categories.map((c, i) => ({ ...c, color: resolveCategoryColor(c, i) }));
+}
+
+function moveById<T extends { id: string }>(items: T[], activeId: string, overId: string): T[] {
+  const from = items.findIndex((i) => i.id === activeId);
+  const to = items.findIndex((i) => i.id === overId);
+  return from < 0 || to < 0 ? items : arrayMove(items, from, to);
 }
 
 function nextValue(clues: Category["clues"]): number {
@@ -27,10 +55,19 @@ function nextValue(clues: Category["clues"]): number {
   return max > 0 ? max + 200 : 200;
 }
 
-export function BoardEditor({ initialGame }: { initialGame: Game }) {
+export function BoardEditor({
+  initialGame,
+  unsaved = false,
+}: {
+  initialGame: Game;
+  /** True for a new board or demo copy that isn't in the database yet. */
+  unsaved?: boolean;
+}) {
   const router = useRouter();
   const [title, setTitle] = useState(initialGame.title);
-  const [categories, setCategories] = useState<Category[]>(initialGame.categories);
+  const [categories, setCategories] = useState<Category[]>(() =>
+    withColors(initialGame.categories)
+  );
   const [navigating, setNavigating] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
 
@@ -46,9 +83,12 @@ export function BoardEditor({ initialGame }: { initialGame: Game }) {
   const issueCount = Object.keys(errors).length;
   const visibleErrors = showErrors ? errors : {};
 
+  // The editor doesn't change teams, so it normally leaves them out of saves
+  // (the play screen owns scores). A board's first save must carry them,
+  // though, or a demo copy would lose the demo's teams.
   const { status, saveNow } = useAutosaveGame(
     initialGame.id,
-    { title, categories },
+    unsaved ? { title, categories, teams: initialGame.teams } : { title, categories },
     { enabled: true }
   );
 
@@ -60,11 +100,37 @@ export function BoardEditor({ initialGame }: { initialGame: Game }) {
   function updateCategoryName(catId: string, name: string) {
     setCategories((cs) => cs.map((c) => (c.id === catId ? { ...c, name } : c)));
   }
+  function updateCategoryColor(catId: string, color: string) {
+    setCategories((cs) => cs.map((c) => (c.id === catId ? { ...c, color } : c)));
+  }
   function removeCategory(catId: string) {
     setCategories((cs) => cs.filter((c) => c.id !== catId));
   }
   function addCategory() {
-    setCategories((cs) => [...cs, blankCategoryFactory()]);
+    setCategories((cs) => {
+      const used = new Set(cs.map((c) => c.color));
+      const color =
+        CATEGORY_COLORS.find((c) => !used.has(c)) ?? CATEGORY_COLORS[cs.length % CATEGORY_COLORS.length];
+      return [...cs, { ...blankCategoryFactory(), color }];
+    });
+  }
+  function moveCategory(activeId: string, overId: string) {
+    setCategories((cs) => moveById(cs, activeId, overId));
+  }
+  function moveClue(catId: string, activeId: string, overId: string) {
+    setCategories((cs) =>
+      cs.map((c) => (c.id === catId ? { ...c, clues: moveById(c.clues, activeId, overId) } : c))
+    );
+  }
+
+  // Drag by the grip handle with a mouse, finger or keyboard (Space, then arrows).
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  function handleCategoryDragEnd({ active, over }: DragEndEvent) {
+    if (over && active.id !== over.id) moveCategory(String(active.id), String(over.id));
   }
   function addClue(catId: string) {
     setCategories((cs) =>
@@ -190,21 +256,35 @@ export function BoardEditor({ initialGame }: { initialGame: Game }) {
             />
           ) : (
             <div className="flex items-start gap-4 overflow-x-auto pb-6">
-              {categories.map((category, i) => (
-                <CategoryColumn
-                  key={category.id}
-                  category={category}
-                  index={i}
-                  errors={visibleErrors}
-                  onNameChange={(name) => updateCategoryName(category.id, name)}
-                  onRemoveCategory={() => removeCategory(category.id)}
-                  onAddClue={() => addClue(category.id)}
-                  onRemoveClue={(clueId) => removeClue(category.id, clueId)}
-                  onClueChange={(clueId, field, value) =>
-                    updateClue(category.id, clueId, field, value)
-                  }
-                />
-              ))}
+              <DndContext
+                id="category-order"
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleCategoryDragEnd}
+              >
+                <SortableContext
+                  items={categories.map((c) => c.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {categories.map((category, i) => (
+                    <CategoryColumn
+                      key={category.id}
+                      category={category}
+                      index={i}
+                      errors={visibleErrors}
+                      onNameChange={(name) => updateCategoryName(category.id, name)}
+                      onColorChange={(color) => updateCategoryColor(category.id, color)}
+                      onRemoveCategory={() => removeCategory(category.id)}
+                      onAddClue={() => addClue(category.id)}
+                      onRemoveClue={(clueId) => removeClue(category.id, clueId)}
+                      onMoveClue={(activeId, overId) => moveClue(category.id, activeId, overId)}
+                      onClueChange={(clueId, field, value) =>
+                        updateClue(category.id, clueId, field, value)
+                      }
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
 
               <button
                 type="button"

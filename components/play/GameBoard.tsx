@@ -2,7 +2,7 @@
 
 import type { Category } from "@/lib/types";
 import { ClueTile } from "./ClueTile";
-import { categoryColor } from "./teamColors";
+import { resolveCategoryColor } from "./teamColors";
 
 interface GameBoardProps {
   categories: Category[];
@@ -23,7 +23,7 @@ export function GameBoard({ categories, onSelectClue }: GameBoardProps) {
         <div
           key={category.id}
           className="flex min-h-[46px] items-center justify-center rounded-[10px] border-2 border-ink px-0.5 py-1 text-center sm:min-h-16 sm:rounded-[14px] sm:px-2 sm:py-2"
-          style={{ gridColumn: i + 1, gridRow: 1, background: categoryColor(i) }}
+          style={{ gridColumn: i + 1, gridRow: 1, background: resolveCategoryColor(category, i) }}
         >
           <span className="hyphens-auto break-words text-[0.6rem] font-bold uppercase leading-tight tracking-wide text-ink [overflow-wrap:anywhere] sm:text-sm sm:tracking-wider">
             {category.name || "—"}

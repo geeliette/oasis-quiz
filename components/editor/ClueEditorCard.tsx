@@ -1,6 +1,10 @@
 "use client";
 
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import clsx from "clsx";
 import type { Clue } from "@/lib/types";
+import { GripIcon } from "@/components/ui/Icons";
 import { TextArea, FieldError } from "@/components/ui/Field";
 import type { FieldErrors } from "@/lib/validation";
 
@@ -19,10 +23,29 @@ const FIELDS = [
 
 export function ClueEditorCard({ clue, errors, onChange, onRemove }: ClueEditorCardProps) {
   const valueError = errors[`clue.${clue.id}.value`];
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
+    useSortable({ id: clue.id });
 
   return (
-    <div className="flex flex-col gap-3 rounded-[16px] border border-border bg-white p-3.5 shadow-[var(--shadow-soft)]">
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      className={clsx(
+        "flex flex-col gap-3 rounded-[16px] border border-border bg-white p-3.5",
+        isDragging ? "relative z-10 shadow-[var(--shadow-pop)]" : "shadow-[var(--shadow-soft)]"
+      )}
+    >
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          aria-label={`Drag to reorder the ${clue.value}-point question`}
+          className="-ml-1.5 flex h-11 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-[10px] text-ink-faint transition-colors hover:bg-surface-soft hover:text-ink active:cursor-grabbing"
+        >
+          <GripIcon />
+        </button>
         <label className="flex items-center gap-2">
           <span className="sr-only">Points</span>
           <input

@@ -24,7 +24,8 @@ export default async function EditGamePage({ params, searchParams }: PageProps) 
   if (id === DEMO_GAME_ID) redirect(`/game/${newGameId()}/edit?new=demo`);
 
   try {
-    let game = await getGame(id);
+    const stored = await getGame(id);
+    let game = stored;
 
     if (!game) {
       if (isNewFlag === "1") {
@@ -50,7 +51,7 @@ export default async function EditGamePage({ params, searchParams }: PageProps) 
       }
     }
 
-    return <BoardEditor initialGame={game} />;
+    return <BoardEditor initialGame={game} unsaved={!stored} />;
   } catch (err) {
     return <DatabaseError err={err} />;
   }
