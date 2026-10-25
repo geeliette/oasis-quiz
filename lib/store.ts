@@ -64,6 +64,15 @@ export async function saveGame(game: Game): Promise<void> {
   await writeFileStore(all);
 }
 
+// Writes a timestamp so the Upstash database registers activity and isn't
+// removed for inactivity on the free tier. No-op without Redis.
+export async function pingStore(): Promise<string | null> {
+  if (!redis) return null;
+  const now = new Date().toISOString();
+  await redis.set("keepalive", now);
+  return now;
+}
+
 export function isUsingRedis(): boolean {
   return hasRedis;
 }
