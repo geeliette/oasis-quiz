@@ -29,13 +29,6 @@
   --color-danger: #e5432a;
   --color-danger-dark: #b42d17;
 
-  /* Stage (play screen) */
-  --color-stage-start: #240a0a;
-  --color-stage-mid: #5c1414;
-  --color-stage-end: #991b1b;
-  --color-tile-start: #ef4444;
-  --color-tile-end: #a01d1d;
-
   --radius-sm: 0.5rem;
   --radius-md: 0.85rem;
   --radius-lg: 1.25rem;
@@ -75,12 +68,6 @@
   --color-success-dark: var(--color-success-dark);
   --color-danger: var(--color-danger);
   --color-danger-dark: var(--color-danger-dark);
-
-  --color-stage-start: var(--color-stage-start);
-  --color-stage-mid: var(--color-stage-mid);
-  --color-stage-end: var(--color-stage-end);
-  --color-tile-start: var(--color-tile-start);
-  --color-tile-end: var(--color-tile-end);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);

@@ -13,7 +13,9 @@ const variantClasses: Record<Variant, string> = {
   accent: clsx(pressable, "bg-accent text-ink shadow-[var(--shadow-hard)]"),
   outline: clsx(pressable, "bg-white text-ink shadow-[var(--shadow-hard)]"),
   ghost: "bg-transparent text-ink-soft hover:bg-surface-soft hover:text-ink",
-  danger: clsx(pressable, "bg-danger text-white shadow-[var(--shadow-hard)]"),
+  // Flat on purpose: it only appears inside small confirm prompts, where a hard
+  // shadow would spill over the prompt's border.
+  danger: "border-2 border-ink bg-danger text-white hover:bg-danger-dark",
   success: clsx(pressable, "bg-success text-ink shadow-[var(--shadow-hard)]"),
 };
 

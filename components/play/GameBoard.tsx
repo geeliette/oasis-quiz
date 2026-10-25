@@ -2,8 +2,7 @@
 
 import type { Category } from "@/lib/types";
 import { ClueTile } from "./ClueTile";
-
-const HEADER_ACCENTS = ["#DC2626", "#FB7185", "#2DD4BF", "#38BDF8", "#FBBF24", "#22C55E"];
+import { categoryColor } from "./teamColors";
 
 interface GameBoardProps {
   categories: Category[];
@@ -23,10 +22,10 @@ export function GameBoard({ categories, onSelectClue }: GameBoardProps) {
       {categories.map((category, i) => (
         <div
           key={category.id}
-          className="flex min-h-12 items-center justify-center rounded-md px-1 py-1.5 text-center shadow-[0_4px_0_rgba(0,0,0,0.2)] sm:min-h-20 sm:rounded-xl sm:px-2 sm:py-2"
-          style={{ gridColumn: i + 1, gridRow: 1, background: HEADER_ACCENTS[i % HEADER_ACCENTS.length] }}
+          className="flex min-h-[46px] items-center justify-center rounded-[10px] border-2 border-ink px-0.5 py-1 text-center sm:min-h-16 sm:rounded-[14px] sm:px-2 sm:py-2"
+          style={{ gridColumn: i + 1, gridRow: 1, background: categoryColor(i) }}
         >
-          <span className="hyphens-auto break-words font-display text-[0.6rem] font-extrabold uppercase leading-tight tracking-wide text-white drop-shadow-sm [overflow-wrap:anywhere] sm:text-lg sm:leading-snug">
+          <span className="hyphens-auto break-words text-[0.6rem] font-bold uppercase leading-tight tracking-wide text-ink [overflow-wrap:anywhere] sm:text-sm sm:tracking-wider">
             {category.name || "—"}
           </span>
         </div>
@@ -38,10 +37,14 @@ export function GameBoard({ categories, onSelectClue }: GameBoardProps) {
           const position = { gridColumn: i + 1, gridRow: rowIndex + 2 };
           return clue ? (
             <div key={clue.id} style={position} className="flex flex-col">
-              <ClueTile clue={clue} onSelect={() => onSelectClue(category.id, clue.id)} />
+              <ClueTile
+                clue={clue}
+                categoryName={category.name}
+                onSelect={() => onSelectClue(category.id, clue.id)}
+              />
             </div>
           ) : (
-            <div key={`${category.id}-${rowIndex}`} style={position} className="aspect-[4/3]" />
+            <div key={`${category.id}-${rowIndex}`} style={position} />
           );
         })
       )}

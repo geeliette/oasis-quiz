@@ -1,38 +1,43 @@
 "use client";
 
-import clsx from "clsx";
 import type { Clue } from "@/lib/types";
 
 interface ClueTileProps {
   clue: Clue;
+  categoryName: string;
   onSelect: () => void;
 }
 
-export function ClueTile({ clue, onSelect }: ClueTileProps) {
+const TILE_SIZE = "h-[52px] rounded-[10px] sm:h-20 sm:rounded-[16px] lg:h-24";
+
+export function ClueTile({ clue, categoryName, onSelect }: ClueTileProps) {
+  const label = `${categoryName || "Category"} for ${clue.value}`;
+
   if (clue.answered) {
     return (
       <button
         type="button"
         onClick={onSelect}
-        aria-label={`Review clue worth ${clue.value} points`}
-        className="group relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md bg-white/5 sm:rounded-xl text-white/20 transition-colors hover:bg-white/10 hover:text-white/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/40"
+        aria-label={`Review ${label}`}
+        className={`group relative flex items-center justify-center border-2 border-dashed border-line text-line transition-colors hover:border-ink-faint hover:text-ink-faint focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/60 ${TILE_SIZE}`}
       >
         <svg
           width="24"
           height="24"
           viewBox="0 0 24 24"
           fill="none"
-          className="transition-opacity group-hover:opacity-0"
+          aria-hidden
+          className="h-[18px] w-[18px] transition-opacity group-hover:opacity-0 sm:h-6 sm:w-6"
         >
           <path
-            d="M5 13l4 4L19 7"
+            d="M5 12.5l4.5 4.5L19 7.5"
             stroke="currentColor"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
         </svg>
-        <span className="absolute font-display text-xs font-bold uppercase tracking-wide opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="absolute text-xs font-bold uppercase tracking-wide opacity-0 transition-opacity group-hover:opacity-100">
           Review
         </span>
       </button>
@@ -43,20 +48,10 @@ export function ClueTile({ clue, onSelect }: ClueTileProps) {
     <button
       type="button"
       onClick={onSelect}
-      className={clsx(
-        "group relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md sm:rounded-xl",
-        "bg-gradient-to-br from-[var(--color-tile-start)] to-[var(--color-tile-end)]",
-        "shadow-[0_4px_0_rgba(0,0,0,0.25),0_8px_16px_rgba(0,0,0,0.25)]",
-        "transition-all duration-150 ease-out",
-        "hover:-translate-y-1 hover:shadow-[0_6px_0_rgba(0,0,0,0.25),0_14px_24px_rgba(0,0,0,0.35)]",
-        "active:translate-y-0 active:shadow-[0_2px_0_rgba(0,0,0,0.25),0_4px_8px_rgba(0,0,0,0.3)]",
-        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/60"
-      )}
+      aria-label={label}
+      className={`flex items-center justify-center border-2 border-ink bg-white font-display text-lg font-extrabold text-ink shadow-[var(--shadow-hard-sm)] transition-transform duration-150 ease-out hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent sm:text-3xl sm:shadow-[var(--shadow-hard)] lg:text-[40px] ${TILE_SIZE}`}
     >
-      <span className="absolute inset-x-0 top-0 h-1/2 bg-white/10" />
-      <span className="relative font-display text-base font-extrabold text-accent drop-shadow-[0_2px_0_rgba(0,0,0,0.4)] min-[400px]:text-lg sm:text-3xl md:text-4xl">
-        {clue.value}
-      </span>
+      {clue.value}
     </button>
   );
 }

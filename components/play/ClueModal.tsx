@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import clsx from "clsx";
 import type { Category, Clue, Team } from "@/lib/types";
+import { Button } from "@/components/ui/Button";
 
 interface ClueModalProps {
   category: Category;
+  categoryColor: string;
   clue: Clue;
   teams: Team[];
   onAward: (teamId: string, delta: number) => void;
@@ -16,6 +19,7 @@ interface ClueModalProps {
 
 export function ClueModal({
   category,
+  categoryColor,
   clue,
   teams,
   onAward,
@@ -59,179 +63,200 @@ export function ClueModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, hintShown]);
 
+  const steps = ["Question", ...(hasHint ? ["Clue"] : []), "Answer"];
+  const currentStep = phase === "answer" ? steps.length - 1 : hintShown ? 1 : 0;
+
+  const sticker =
+    "absolute rounded-[12px] border-2 border-ink px-3 py-1.5 text-xs font-bold uppercase tracking-wider sm:px-4 sm:py-2 sm:text-[15px]";
+  const valueSticker =
+    "absolute -right-2 -top-6 flex h-14 w-14 rotate-[8deg] items-center justify-center rounded-full border-2 border-ink bg-accent font-display text-xl font-extrabold sm:right-10 sm:-top-7 sm:h-[76px] sm:w-[76px] sm:text-[26px]";
+  const face =
+    "backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-[24px] border-2 border-ink bg-white px-5 pb-8 pt-12 text-center shadow-[8px_8px_0_var(--color-ink)] sm:rounded-[32px] sm:px-14 sm:pb-14 sm:pt-[72px] sm:shadow-[10px_10px_0_var(--color-ink)]";
+
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-[radial-gradient(circle_at_50%_20%,var(--color-stage-mid),var(--color-stage-start))]/95 p-4 backdrop-blur-sm sm:p-8"
+        className="fixed inset-0 z-50 flex flex-col gap-4 overflow-y-auto bg-background/75 backdrop-blur-[3px] px-4 py-4 text-ink sm:px-7 sm:py-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
+        transition={{ duration: 0.2 }}
       >
-        {clue.answered && (
-          <div className="absolute left-4 top-4 flex items-center gap-2.5 sm:left-8 sm:top-8">
-            <span className="hidden items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-sm font-bold text-white/90 sm:inline-flex">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M3.5 8.5l3 3 6-7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Already played
-            </span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onReset();
-              }}
-              className="flex items-center gap-2 rounded-full border-2 border-accent bg-accent/15 px-4 py-2 font-display text-sm font-bold text-accent shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-all hover:-translate-y-0.5 hover:bg-accent hover:text-[#3a2600] active:translate-y-0 sm:px-5 sm:py-2.5 sm:text-base"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M3 8a5 5 0 1 1 1.6 3.66M3 8V4.5M3 8h3.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Mark as unplayed
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-between gap-3">
+          {clue.answered ? (
+            <div className="flex items-center gap-2.5">
+              <span className="hidden items-center gap-1.5 rounded-full bg-surface-soft px-3.5 py-2 text-sm font-bold text-ink-soft sm:inline-flex">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <path
+                    d="M3.5 8.5l3 3 6-7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Already played
+              </span>
+              <Button variant="accent" onClick={onReset}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <path
+                    d="M3 8a5 5 0 1 1 1.6 3.66M3 8V4.5M3 8h3.5"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Mark as unplayed
+              </Button>
+            </div>
+          ) : (
+            <ol className="flex items-center gap-1.5 text-xs font-bold sm:gap-2 sm:text-sm">
+              {steps.map((step, i) => (
+                <li
+                  key={step}
+                  aria-current={i === currentStep ? "step" : undefined}
+                  className={clsx(
+                    "rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5",
+                    i === currentStep
+                      ? "border-2 border-ink bg-ink text-white"
+                      : i < currentStep
+                        ? "border-2 border-ink text-ink"
+                        : "border-2 border-line text-ink-faint"
+                  )}
+                >
+                  {i + 1} · {step}
+                </li>
+              ))}
+            </ol>
+          )}
 
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleExit();
-          }}
-          aria-label="Close clue"
-          className="absolute right-4 top-4 flex h-11 min-w-11 items-center justify-center gap-2 rounded-full border-2 border-white/70 bg-white/15 px-3 font-display text-base font-bold text-white shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-all hover:-translate-y-0.5 hover:bg-white hover:text-[var(--color-stage-start)] active:translate-y-0 sm:right-8 sm:top-8 sm:h-12 sm:px-4"
-        >
-          <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-          </svg>
-          <span className="hidden sm:inline">Close</span>
-          <kbd className="hidden rounded-md bg-black/20 px-1.5 py-0.5 font-sans text-xs font-semibold opacity-80 sm:inline">
-            Esc
-          </kbd>
-        </button>
+          <Button variant="outline" onClick={handleExit} aria-label="Close clue" className="shrink-0">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+            <span className="hidden sm:inline">Close</span>
+            <kbd className="hidden rounded-md bg-surface-soft px-1.5 py-0.5 font-sans text-xs font-bold text-ink-soft sm:inline">
+              Esc
+            </kbd>
+          </Button>
+        </div>
 
-        <div className="perspective w-full max-w-4xl">
+        <div className="perspective flex w-full flex-1 items-center justify-center py-6">
           <motion.div
-            className="preserve-3d relative min-h-[420px] w-full cursor-pointer sm:min-h-[480px]"
+            className="preserve-3d relative min-h-[420px] w-full max-w-[920px] cursor-pointer sm:min-h-[460px]"
             style={{ transformStyle: "preserve-3d" }}
             animate={{ rotateY: phase === "answer" ? 180 : 0 }}
             transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
             onClick={advance}
           >
             {/* Front: question */}
-            <div className="backface-hidden absolute inset-0 flex flex-col items-center justify-center gap-6 rounded-[2rem] border border-white/10 bg-gradient-to-br from-[var(--color-tile-start)] to-[var(--color-tile-end)] p-8 text-center shadow-[var(--shadow-pop)] sm:p-14">
-              <span className="rounded-full bg-white/15 px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide text-white/90">
-                {category.name} · {clue.value} pts
+            <div className={clsx(face, "gap-7 sm:gap-9")}>
+              <span
+                className={clsx(sticker, "-top-4 left-5 -rotate-[4deg] sm:-top-5 sm:left-10")}
+                style={{ background: categoryColor }}
+              >
+                {category.name}
               </span>
-              <p className="whitespace-pre-line font-display text-2xl font-bold leading-snug text-white sm:text-4xl">
+              <span className={valueSticker}>{clue.value}</span>
+
+              <p className="whitespace-pre-line font-display text-[28px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[52px] sm:leading-[1.1]">
                 {clue.question}
               </p>
               {hintShown && hasHint && (
-                <div className="flex flex-col items-center gap-1.5">
-                  <span className="rounded-full bg-accent/20 px-3 py-1 font-display text-xs font-bold uppercase tracking-wide text-accent">
+                <div className="flex max-w-[680px] flex-col items-center gap-2 rounded-[16px] bg-surface-soft px-5 py-3.5 sm:flex-row sm:gap-3 sm:text-left">
+                  <span className="shrink-0 rounded-full border-2 border-ink bg-teal px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider">
                     Clue
                   </span>
-                  <p className="whitespace-pre-line text-lg font-medium leading-snug text-white/85 sm:text-xl">
+                  <p className="whitespace-pre-line text-lg font-medium leading-snug text-ink sm:text-xl">
                     {clue.hint}
                   </p>
                 </div>
               )}
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-3.5">
                 {hasHint && !hintShown && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="outline"
+                    size="lg"
                     onClick={(e) => {
                       e.stopPropagation();
                       setHintShown(true);
                     }}
-                    className="rounded-2xl bg-white/15 px-6 py-3 font-display font-bold text-white shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-transform hover:-translate-y-0.5 active:translate-y-0"
                   >
-                    Show Clue
-                  </button>
+                    Show clue
+                  </Button>
                 )}
-                <button
-                  type="button"
+                <Button
+                  size="lg"
                   onClick={(e) => {
                     e.stopPropagation();
                     setPhase("answer");
                   }}
-                  className="rounded-2xl bg-accent px-6 py-3 font-display font-bold text-[#3a2600] shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-transform hover:-translate-y-0.5 active:translate-y-0"
                 >
-                  Reveal Answer
-                </button>
+                  Reveal answer
+                </Button>
               </div>
-              <span className="text-xs font-medium text-white/50">
-                Press space or click the card
-              </span>
+              <p className="hidden text-[15px] text-ink-faint sm:block">
+                Press{" "}
+                <kbd className="rounded-md bg-surface-soft px-2 py-0.5 font-sans font-bold text-ink">
+                  Space
+                </kbd>{" "}
+                to reveal
+              </p>
             </div>
 
             {/* Back: answer + scoring */}
             <div
-              className="backface-hidden absolute inset-0 flex flex-col items-center justify-center gap-6 rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#1a0505] to-[var(--color-stage-end)] p-6 text-center shadow-[var(--shadow-pop)] sm:p-10"
+              className={clsx(face, "cursor-default gap-6")}
               style={{ transform: "rotateY(180deg)" }}
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="rounded-full bg-accent/20 px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide text-accent">
+              <span className={clsx(sticker, "-top-4 left-5 -rotate-[4deg] bg-teal sm:-top-5 sm:left-10")}>
                 Answer
               </span>
-              <p className="whitespace-pre-line font-display text-xl font-bold leading-snug text-white sm:text-3xl">
+              <span className={valueSticker}>{clue.value}</span>
+
+              <p className="whitespace-pre-line font-display text-2xl font-extrabold leading-tight sm:text-[40px]">
                 {clue.answer}
               </p>
 
               {teams.length > 0 && (
-                <div className="flex w-full flex-wrap items-center justify-center gap-2.5 border-t border-white/10 pt-5">
+                <div className="flex w-full flex-wrap items-center justify-center gap-2.5 border-t-2 border-dashed border-line pt-5">
                   {teams.map((team) => (
                     <div
                       key={team.id}
-                      className="flex items-center gap-1.5 rounded-xl bg-white/10 py-1.5 pl-3 pr-1.5"
+                      className="flex items-center gap-1.5 rounded-[14px] border-2 border-ink bg-white py-1 pl-3 pr-1"
                     >
                       <span
-                        className="h-2.5 w-2.5 rounded-full"
+                        className="h-3 w-3 rounded-full border-2 border-ink"
                         style={{ background: team.color }}
+                        aria-hidden
                       />
-                      <span className="max-w-[7rem] truncate text-sm font-semibold text-white">
-                        {team.name}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => onAward(team.id, clue.value)}
-                        className="rounded-lg bg-success/90 px-2 py-1 text-xs font-bold text-white transition-transform hover:scale-105 active:scale-95"
-                        aria-label={`Award ${clue.value} to ${team.name}`}
-                      >
-                        +{clue.value}
-                      </button>
+                      <span className="max-w-[7rem] truncate pr-1 text-sm font-bold">{team.name}</span>
                       <button
                         type="button"
                         onClick={() => onAward(team.id, -clue.value)}
-                        className="rounded-lg bg-danger/90 px-2 py-1 text-xs font-bold text-white transition-transform hover:scale-105 active:scale-95"
-                        aria-label={`Deduct ${clue.value} from ${team.name}`}
+                        className="flex h-11 min-w-11 items-center justify-center rounded-[10px] px-2 text-sm font-bold transition-colors hover:bg-surface-soft"
+                        aria-label={`Take ${clue.value} from ${team.name}`}
                       >
                         −{clue.value}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onAward(team.id, clue.value)}
+                        className="flex h-11 min-w-11 items-center justify-center rounded-[10px] bg-ink px-2.5 text-sm font-bold text-white transition-transform active:scale-95"
+                        aria-label={`Give ${clue.value} to ${team.name}`}
+                      >
+                        +{clue.value}
                       </button>
                     </div>
                   ))}
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-2xl bg-white/15 px-6 py-2.5 font-display font-bold text-white transition-colors hover:bg-white/25"
-              >
+              <Button variant="outline" onClick={onClose}>
                 Done
-              </button>
+              </Button>
             </div>
           </motion.div>
         </div>

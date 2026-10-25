@@ -60,9 +60,9 @@ export function buildDemoGame(): Game {
   ];
 
   const teams: Team[] = [
-    { id: newId(), name: "Team Sunshine", color: "#F5A524", score: 0 },
-    { id: newId(), name: "Team Ocean", color: "#3B82F6", score: 0 },
-    { id: newId(), name: "Team Forest", color: "#22C55E", score: 0 },
+    { id: newId(), name: "Team Sunshine", color: "#FFC53D", score: 0 },
+    { id: newId(), name: "Team Ocean", color: "#4DA8FF", score: 0 },
+    { id: newId(), name: "Team Forest", color: "#3DD9A5", score: 0 },
   ];
 
   return {

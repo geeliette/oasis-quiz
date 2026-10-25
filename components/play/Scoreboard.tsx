@@ -24,32 +24,37 @@ export function Scoreboard({
   onAdd,
 }: ScoreboardProps) {
   const [managing, setManaging] = useState(false);
+  const [perTap, setPerTap] = useState("100");
+  const amount = Math.abs(Number(perTap)) || 0;
 
   return (
-    <aside className="flex w-full shrink-0 flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 lg:h-full lg:w-72 lg:p-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-sm font-bold uppercase tracking-wide text-white/70">
-          Scoreboard
-        </h2>
-        <button
-          type="button"
-          onClick={() => setManaging((m) => !m)}
-          className={clsx(
-            "rounded-lg px-2.5 py-1 text-xs font-bold transition-colors",
-            managing ? "bg-accent text-[#3a2600]" : "bg-white/10 text-white/70 hover:bg-white/20"
+    <aside className="flex w-full shrink-0 flex-col gap-3 lg:w-80">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <h2 className="font-display text-[22px] font-extrabold text-ink">Scores</h2>
+        <div className="flex items-center gap-2">
+          {!managing && (
+            <label className="flex items-center gap-2 text-sm text-ink-soft">
+              Points per tap
+              <input
+                type="number"
+                min={0}
+                value={perTap}
+                onChange={(e) => setPerTap(e.target.value)}
+                className="h-10 w-[72px] rounded-[10px] border-2 border-ink bg-white text-center font-bold text-ink outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              />
+            </label>
           )}
-        >
-          {managing ? "Done" : "Manage teams"}
-        </button>
+          <Button
+            variant={managing ? "accent" : "ghost"}
+            size="sm"
+            onClick={() => setManaging((m) => !m)}
+          >
+            {managing ? "Done" : "Manage"}
+          </Button>
+        </div>
       </div>
 
-      {teams.length === 0 && (
-        <p className="rounded-xl bg-white/5 p-3 text-center text-sm text-white/50">
-          No teams yet — add one to start keeping score.
-        </p>
-      )}
-
-      <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:grid-cols-3 sm:gap-2.5 lg:flex lg:flex-col">
+      <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
         {teams.map((team) =>
           managing ? (
             <TeamEditRow
@@ -63,7 +68,8 @@ export function Scoreboard({
             <TeamScoreRow
               key={team.id}
               team={team}
-              onAdjust={(delta) => onAdjust(team.id, delta)}
+              onMinus={() => onAdjust(team.id, -amount)}
+              onPlus={() => onAdjust(team.id, amount)}
             />
           )
         )}
@@ -73,7 +79,7 @@ export function Scoreboard({
         <button
           type="button"
           onClick={onAdd}
-          className="rounded-xl border-2 border-dashed border-white/20 py-2 text-sm font-bold text-white/70 transition-colors hover:border-white/40 hover:text-white"
+          className="min-h-11 rounded-[14px] border-2 border-dashed border-line font-bold text-ink-soft transition-colors hover:border-ink hover:text-ink"
         >
           + Add team
         </button>
@@ -84,52 +90,47 @@ export function Scoreboard({
 
 function TeamScoreRow({
   team,
-  onAdjust,
+  onMinus,
+  onPlus,
 }: {
   team: Team;
-  onAdjust: (delta: number) => void;
+  onMinus: () => void;
+  onPlus: () => void;
 }) {
-  const [customAmount, setCustomAmount] = useState("100");
-  const amount = Math.abs(Number(customAmount)) || 0;
-
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-xl bg-white/8 p-2.5 sm:p-3">
-      <div className="flex items-center gap-2">
-        <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: team.color }} />
-        <span className="min-w-0 flex-1 truncate font-display text-sm font-bold text-white sm:text-base">
-          {team.name}
-        </span>
-        <span
-          key={team.score}
-          className="animate-pop font-display text-xl font-extrabold text-accent tabular-nums sm:text-2xl"
-        >
-          {team.score}
-        </span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <button
-          type="button"
-          onClick={() => onAdjust(-amount)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-danger/80 font-bold text-white transition-transform hover:scale-105 active:scale-95"
-          aria-label={`Subtract points from ${team.name}`}
-        >
-          −
-        </button>
-        <input
-          type="number"
-          value={customAmount}
-          onChange={(e) => setCustomAmount(e.target.value)}
-          className="w-0 min-w-10 flex-1 rounded-lg border border-white/15 bg-white/10 px-1.5 py-1 text-center text-xs font-semibold text-white outline-none focus:border-white/40"
-        />
-        <button
-          type="button"
-          onClick={() => onAdjust(amount)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-success/80 font-bold text-white transition-transform hover:scale-105 active:scale-95"
-          aria-label={`Add points to ${team.name}`}
-        >
-          +
-        </button>
-      </div>
+    <div className="flex min-w-0 items-center gap-2 rounded-[14px] border-2 border-ink bg-white py-2 pl-3.5 pr-2">
+      <span
+        className="h-3 w-3 shrink-0 rounded-full border-2 border-ink"
+        style={{ background: team.color }}
+        aria-hidden
+      />
+      <span className="min-w-0 flex-1 truncate font-bold text-ink">{team.name}</span>
+      <span
+        key={team.score}
+        className="animate-pop pr-1 font-display text-2xl font-extrabold tabular-nums text-ink"
+      >
+        {team.score}
+      </span>
+      <button
+        type="button"
+        onClick={onMinus}
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] border-2 border-ink bg-white transition-transform active:scale-95"
+        aria-label={`Take points from ${team.name}`}
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M3 8h10" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        onClick={onPlus}
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] border-2 border-ink bg-ink text-white transition-transform active:scale-95"
+        aria-label={`Give points to ${team.name}`}
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -146,35 +147,37 @@ function TeamEditRow({
   onRemove: () => void;
 }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-xl bg-white/8 p-2.5 sm:p-3">
+    <div className="flex min-w-0 flex-col gap-2.5 rounded-[14px] border-2 border-ink bg-white p-3">
       <div className="flex items-center gap-2">
         <input
           value={team.name}
           onChange={(e) => onRename(e.target.value)}
           placeholder="Team name"
-          className="min-w-0 flex-1 rounded-lg border border-white/15 bg-white/10 px-2 py-1.5 text-sm font-semibold text-white outline-none focus:border-white/40"
+          aria-label="Team name"
+          className="h-11 min-w-0 flex-1 rounded-[10px] border-2 border-border bg-white px-3 font-semibold text-ink outline-none focus:border-ink"
         />
         <button
           type="button"
           onClick={onRemove}
           aria-label={`Remove ${team.name}`}
-          className="shrink-0 rounded-lg p-1.5 text-white/60 transition-colors hover:bg-danger/20 hover:text-danger"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] text-ink-faint transition-colors hover:bg-danger/10 hover:text-danger"
         >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </button>
       </div>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         {TEAM_COLORS.map((c) => (
           <button
             key={c}
             type="button"
             onClick={() => onColorChange(c)}
-            aria-label={`Set color ${c}`}
+            aria-label={`Set colour ${c}`}
+            aria-pressed={team.color === c}
             className={clsx(
-              "h-5 w-5 rounded-full transition-transform hover:scale-110",
-              team.color === c && "ring-2 ring-white ring-offset-2 ring-offset-transparent"
+              "h-8 w-8 rounded-full border-2 border-ink transition-transform hover:scale-110",
+              team.color === c && "ring-2 ring-ink ring-offset-2"
             )}
             style={{ background: c }}
           />
