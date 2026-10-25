@@ -69,25 +69,39 @@ export function ClueModal({
         transition={{ duration: 0.25 }}
       >
         {clue.answered && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onReset();
-            }}
-            className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-xs font-bold text-white/80 transition-colors hover:bg-white/20 hover:text-white sm:left-8 sm:top-8"
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M3 8a5 5 0 1 1 1.6 3.66M3 8V4.5M3 8h3.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Mark as unplayed
-          </button>
+          <div className="absolute left-4 top-4 flex items-center gap-2.5 sm:left-8 sm:top-8">
+            <span className="hidden items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-sm font-bold text-white/90 sm:inline-flex">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M3.5 8.5l3 3 6-7"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Already played
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReset();
+              }}
+              className="flex items-center gap-2 rounded-full border-2 border-accent bg-accent/15 px-4 py-2 font-display text-sm font-bold text-accent shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-all hover:-translate-y-0.5 hover:bg-accent hover:text-[#3a2600] active:translate-y-0 sm:px-5 sm:py-2.5 sm:text-base"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M3 8a5 5 0 1 1 1.6 3.66M3 8V4.5M3 8h3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Mark as unplayed
+            </button>
+          </div>
         )}
 
         <button
@@ -97,11 +111,15 @@ export function ClueModal({
             handleExit();
           }}
           aria-label="Close clue"
-          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white sm:right-8 sm:top-8"
+          className="absolute right-4 top-4 flex h-11 min-w-11 items-center justify-center gap-2 rounded-full border-2 border-white/70 bg-white/15 px-3 font-display text-base font-bold text-white shadow-[0_4px_0_rgba(0,0,0,0.2)] transition-all hover:-translate-y-0.5 hover:bg-white hover:text-[var(--color-stage-start)] active:translate-y-0 sm:right-8 sm:top-8 sm:h-12 sm:px-4"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
           </svg>
+          <span className="hidden sm:inline">Close</span>
+          <kbd className="hidden rounded-md bg-black/20 px-1.5 py-0.5 font-sans text-xs font-semibold opacity-80 sm:inline">
+            Esc
+          </kbd>
         </button>
 
         <div className="perspective w-full max-w-4xl">
