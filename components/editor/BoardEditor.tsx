@@ -108,8 +108,13 @@ export function BoardEditor({ initialGame }: { initialGame: Game }) {
       return;
     }
     setNavigating(true);
-    await saveNow();
-    router.push(`/game/${initialGame.id}`);
+    // Don't open the play screen until the board is safely on the server; a
+    // board that was never saved would show "doesn't exist" there.
+    if (await saveNow()) {
+      router.push(`/game/${initialGame.id}`);
+    } else {
+      setNavigating(false);
+    }
   }
 
   const playUrl = origin ? `${origin}/game/${initialGame.id}` : `/game/${initialGame.id}`;

@@ -7,7 +7,8 @@ export function SaveStatusIndicator({ status }: { status: Status }) {
     idle: { label: "All changes saved", className: "text-ink-faint" },
     saving: { label: "Saving…", className: "text-primary" },
     saved: { label: "Saved", className: "text-success-dark" },
-    error: { label: "Couldn't save — retrying", className: "text-danger" },
+    error: { label: "Couldn't save — retrying…", className: "text-danger-dark" },
+    failed: { label: "Couldn't save — check your connection", className: "text-danger-dark" },
   };
   const { label, className } = config[status];
 
@@ -19,7 +20,11 @@ export function SaveStatusIndicator({ status }: { status: Status }) {
         <span
           className={clsx(
             "h-2 w-2 rounded-full",
-            status === "error" ? "bg-danger" : status === "saved" ? "bg-success" : "bg-ink-faint"
+            status === "error" || status === "failed"
+              ? "bg-danger"
+              : status === "saved"
+                ? "bg-success"
+                : "bg-ink-faint"
           )}
         />
       )}
