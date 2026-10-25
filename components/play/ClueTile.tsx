@@ -15,11 +15,11 @@ export function ClueTile({ clue, onSelect }: ClueTileProps) {
         type="button"
         onClick={onSelect}
         aria-label={`Review clue worth ${clue.value} points`}
-        className="group relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl bg-white/5 text-white/20 transition-colors hover:bg-white/10 hover:text-white/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/40"
+        className="group relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md bg-white/5 sm:rounded-xl text-white/20 transition-colors hover:bg-white/10 hover:text-white/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/40"
       >
         <svg
-          width="28"
-          height="28"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           className="transition-opacity group-hover:opacity-0"
@@ -44,7 +44,7 @@ export function ClueTile({ clue, onSelect }: ClueTileProps) {
       type="button"
       onClick={onSelect}
       className={clsx(
-        "group relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl",
+        "group relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md sm:rounded-xl",
         "bg-gradient-to-br from-[var(--color-tile-start)] to-[var(--color-tile-end)]",
         "shadow-[0_4px_0_rgba(0,0,0,0.25),0_8px_16px_rgba(0,0,0,0.25)]",
         "transition-all duration-150 ease-out",
@@ -54,7 +54,7 @@ export function ClueTile({ clue, onSelect }: ClueTileProps) {
       )}
     >
       <span className="absolute inset-x-0 top-0 h-1/2 bg-white/10" />
-      <span className="relative font-display text-2xl font-extrabold text-accent drop-shadow-[0_2px_0_rgba(0,0,0,0.4)] sm:text-3xl md:text-4xl">
+      <span className="relative font-display text-base font-extrabold text-accent drop-shadow-[0_2px_0_rgba(0,0,0,0.4)] min-[400px]:text-lg sm:text-3xl md:text-4xl">
         {clue.value}
       </span>
     </button>

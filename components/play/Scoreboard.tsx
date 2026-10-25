@@ -49,7 +49,7 @@ export function Scoreboard({
         </p>
       )}
 
-      <div className="flex flex-row gap-2.5 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
+      <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:grid-cols-3 sm:gap-2.5 lg:flex lg:flex-col">
         {teams.map((team) =>
           managing ? (
             <TeamEditRow
@@ -93,13 +93,15 @@ function TeamScoreRow({
   const amount = Math.abs(Number(customAmount)) || 0;
 
   return (
-    <div className="flex min-w-[13rem] shrink-0 flex-col gap-2 rounded-xl bg-white/8 p-3 lg:min-w-0">
+    <div className="flex min-w-0 flex-col gap-2 rounded-xl bg-white/8 p-2.5 sm:p-3">
       <div className="flex items-center gap-2">
         <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: team.color }} />
-        <span className="flex-1 truncate font-display font-bold text-white">{team.name}</span>
+        <span className="min-w-0 flex-1 truncate font-display text-sm font-bold text-white sm:text-base">
+          {team.name}
+        </span>
         <span
           key={team.score}
-          className="animate-pop font-display text-2xl font-extrabold text-accent tabular-nums"
+          className="animate-pop font-display text-xl font-extrabold text-accent tabular-nums sm:text-2xl"
         >
           {team.score}
         </span>
@@ -108,7 +110,7 @@ function TeamScoreRow({
         <button
           type="button"
           onClick={() => onAdjust(-amount)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg bg-danger/80 font-bold text-white transition-transform hover:scale-105 active:scale-95"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-danger/80 font-bold text-white transition-transform hover:scale-105 active:scale-95"
           aria-label={`Subtract points from ${team.name}`}
         >
           −
@@ -117,12 +119,12 @@ function TeamScoreRow({
           type="number"
           value={customAmount}
           onChange={(e) => setCustomAmount(e.target.value)}
-          className="w-14 rounded-lg border border-white/15 bg-white/10 px-1.5 py-1 text-center text-xs font-semibold text-white outline-none focus:border-white/40"
+          className="w-0 min-w-10 flex-1 rounded-lg border border-white/15 bg-white/10 px-1.5 py-1 text-center text-xs font-semibold text-white outline-none focus:border-white/40"
         />
         <button
           type="button"
           onClick={() => onAdjust(amount)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg bg-success/80 font-bold text-white transition-transform hover:scale-105 active:scale-95"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-success/80 font-bold text-white transition-transform hover:scale-105 active:scale-95"
           aria-label={`Add points to ${team.name}`}
         >
           +
@@ -144,7 +146,7 @@ function TeamEditRow({
   onRemove: () => void;
 }) {
   return (
-    <div className="flex min-w-[15rem] shrink-0 flex-col gap-2 rounded-xl bg-white/8 p-3 lg:min-w-0">
+    <div className="flex min-w-0 flex-col gap-2 rounded-xl bg-white/8 p-2.5 sm:p-3">
       <div className="flex items-center gap-2">
         <input
           value={team.name}

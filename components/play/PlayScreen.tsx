@@ -140,7 +140,7 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
         aria-hidden
       />
       <div className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6">
+      <header className="flex items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-2">
           <Link href="/" className="shrink-0 text-xl" aria-label="Oasis Quiz home">
             🏝️
@@ -149,8 +149,10 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
             {initialGame.title || "Untitled Game"}
           </h1>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <SaveStatusIndicator status={status} />
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <div className="hidden sm:block">
+            <SaveStatusIndicator status={status} />
+          </div>
           {confirmingRestart ? (
             <div className="flex items-center gap-1.5 rounded-lg bg-white/10 p-1 text-xs font-bold">
               <span className="pl-1.5 text-white/70">Restart board?</span>
@@ -175,20 +177,23 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
               onClick={() => setConfirmingRestart(true)}
               className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-bold text-white/80 transition-colors hover:bg-white/20"
             >
-              Restart board
+              Restart<span className="hidden sm:inline"> board</span>
             </button>
           )}
           <Link
             href={`/game/${initialGame.id}/edit`}
             className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-bold text-white/80 transition-colors hover:bg-white/20"
           >
-            {initialGame.id === DEMO_GAME_ID ? "Edit a copy" : "Edit board"}
+            Edit
+            <span className="hidden sm:inline">
+              {initialGame.id === DEMO_GAME_ID ? " a copy" : " board"}
+            </span>
           </Link>
         </div>
       </header>
 
       <main className="flex flex-1 flex-col gap-4 px-4 pb-6 sm:px-6 lg:flex-row">
-        <div className="flex-1">
+        <div className="lg:min-w-0 lg:flex-1">
           {boardComplete && (
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3">
               <span className="font-display text-sm font-bold text-accent">
