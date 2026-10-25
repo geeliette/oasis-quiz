@@ -15,6 +15,14 @@ import type { Game } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { FieldError, Input } from "@/components/ui/Field";
 
+// Gives each board a stable sticker colour so rows are easy to tell apart.
+const DOT_COLORS = ["bg-coral", "bg-accent", "bg-teal", "bg-sky", "bg-lilac"];
+function dotColor(id: string): string {
+  let hash = 0;
+  for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return DOT_COLORS[hash % DOT_COLORS.length];
+}
+
 function timeAgo(timestamp: number): string {
   const minutes = Math.round((Date.now() - timestamp) / 60000);
   if (minutes < 1) return "just now";
@@ -34,20 +42,16 @@ export function RecentBoards() {
   const [adding, setAdding] = useState(false);
 
   return (
-    <section className="mt-14 w-full max-w-2xl text-left">
+    <section className="mx-auto flex w-full max-w-[720px] flex-col text-left">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-xl font-bold text-ink">Your boards</h2>
-          <p className="text-xs text-ink-faint">Saved in this browser</p>
+          <h2 className="font-display text-[26px] font-extrabold text-ink">Your boards</h2>
+          <p className="text-sm text-ink-faint">Saved in this browser</p>
         </div>
         {!adding && (
-          <button
-            type="button"
-            onClick={() => setAdding(true)}
-            className="shrink-0 rounded-lg px-3 py-1.5 font-display text-sm font-bold text-primary transition-colors hover:bg-surface-soft"
-          >
+          <Button variant="outline" onClick={() => setAdding(true)} className="shrink-0">
             + Add by link
-          </button>
+          </Button>
         )}
       </div>
 
@@ -55,15 +59,15 @@ export function RecentBoards() {
 
       {/* null = still reading this browser's list; render nothing to avoid a flash. */}
       {boards && boards.length === 0 && !adding && (
-        <div className="mt-3 rounded-xl border-2 border-dashed border-border px-4 py-6 text-center">
-          <p className="font-display font-bold text-ink">No boards yet</p>
-          <p className="mt-1 text-sm text-ink-soft">
+        <div className="mt-3.5 rounded-[16px] border-2 border-dashed border-line px-5 py-7 text-center">
+          <p className="font-display text-lg font-extrabold text-ink">No boards yet</p>
+          <p className="mt-1 text-ink-soft">
             Boards you create or play here will show up in this list. Got a link to one from
             before?{" "}
             <button
               type="button"
               onClick={() => setAdding(true)}
-              className="font-bold text-primary underline-offset-2 hover:underline"
+              className="font-bold text-ink underline decoration-coral decoration-2 underline-offset-4 hover:decoration-ink"
             >
               Add it by link
             </button>
@@ -73,26 +77,30 @@ export function RecentBoards() {
       )}
 
       {boards && boards.length > 0 && (
-        <ul className="mt-3 flex flex-col gap-2">
+        <ul className="mt-3.5 flex flex-col gap-3">
           {boards.map((board) => (
             // The title link stretches over the whole row (after:inset-0) so
             // clicking anywhere opens the board; Edit and remove sit above it.
             <li
               key={board.id}
-              className="group relative flex items-center gap-2 rounded-xl border-2 border-border bg-white py-3 pl-4 pr-2 shadow-[var(--shadow-soft)] transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)] focus-within:border-primary/40 sm:gap-3"
+              className="group relative flex items-center gap-2 rounded-[16px] border-2 border-ink bg-white py-3 pl-5 pr-2 shadow-[var(--shadow-hard)] transition-transform hover:-translate-x-px hover:-translate-y-px"
             >
-              <div className="min-w-0 flex-1">
+              <span
+                className={`${dotColor(board.id)} h-3 w-3 shrink-0 rounded-full border-2 border-ink`}
+                aria-hidden
+              />
+              <div className="min-w-0 flex-1 pl-1.5">
                 <Link
                   href={`/game/${board.id}`}
-                  className="block truncate font-display font-bold text-ink outline-none transition-colors group-hover:text-primary after:absolute after:inset-0 after:rounded-xl after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-primary/50"
+                  className="block truncate font-display text-[19px] font-extrabold text-ink outline-none after:absolute after:inset-0 after:rounded-[16px] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-accent focus-visible:after:ring-offset-2"
                 >
                   {board.title.trim() || "Untitled game"}
                 </Link>
-                <p className="text-xs text-ink-faint">Opened {timeAgo(board.lastOpenedAt)}</p>
+                <p className="text-sm text-ink-faint">Opened {timeAgo(board.lastOpenedAt)}</p>
               </div>
               <Link
                 href={`/game/${board.id}/edit`}
-                className="relative z-10 shrink-0 rounded-lg px-3 py-1.5 font-display text-sm font-bold text-ink-soft transition-colors hover:bg-surface-soft hover:text-primary"
+                className="relative z-10 inline-flex min-h-11 shrink-0 items-center rounded-[10px] px-3.5 font-bold text-ink transition-colors hover:bg-surface-soft"
               >
                 Edit
               </Link>
@@ -101,10 +109,10 @@ export function RecentBoards() {
                 onClick={() => forgetBoard(board.id)}
                 aria-label={`Remove ${board.title.trim() || "Untitled game"} from this list`}
                 title="Remove from this list"
-                className="relative z-10 shrink-0 rounded-lg p-2 text-ink-faint transition-colors hover:bg-surface-soft hover:text-ink"
+                className="relative z-10 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] text-ink-faint transition-colors hover:bg-surface-soft hover:text-ink"
               >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
             </li>
@@ -155,7 +163,7 @@ function AddBoardForm({ onDone }: { onDone: () => void }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mt-3 rounded-xl border-2 border-border bg-white p-3 shadow-[var(--shadow-soft)]"
+      className="mt-3.5 rounded-[16px] border-2 border-ink bg-white p-4 shadow-[var(--shadow-hard)]"
     >
       <label htmlFor="board-link" className="text-sm font-bold text-ink">
         Paste a board link
@@ -174,10 +182,10 @@ function AddBoardForm({ onDone }: { onDone: () => void }) {
           className="min-w-0 flex-1 text-sm"
         />
         <div className="flex gap-2">
-          <Button type="submit" size="sm" disabled={checking || !link.trim()} className="flex-1 sm:flex-none">
+          <Button type="submit" disabled={checking || !link.trim()} className="flex-1 sm:flex-none">
             {checking ? "Checking…" : "Add board"}
           </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={onDone}>
+          <Button type="button" variant="ghost" onClick={onDone}>
             Cancel
           </Button>
         </div>

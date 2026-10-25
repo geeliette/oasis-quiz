@@ -4,13 +4,11 @@ import { InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from "react";
 import clsx from "clsx";
 
 const baseFieldClasses =
-  "w-full rounded-md border bg-white px-3.5 py-2.5 text-ink placeholder:text-ink-faint " +
-  "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30";
+  "w-full rounded-[12px] border-2 bg-white px-3.5 py-2.5 text-ink placeholder:text-ink-faint " +
+  "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60";
 
 function borderClasses(hasError?: boolean) {
-  return hasError
-    ? "border-danger/50 focus:border-danger"
-    : "border-border focus:border-primary/60";
+  return hasError ? "border-danger focus:border-danger" : "border-border focus:border-ink";
 }
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {

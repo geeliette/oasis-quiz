@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { getGame } from "@/lib/store";
 import { PlayScreen } from "@/components/play/PlayScreen";
-import { Button } from "@/components/ui/Button";
+import { buttonClasses } from "@/components/ui/buttonStyles";
+import { AlertIcon, LostIcon } from "@/components/ui/Icons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ForgetBoard } from "@/components/home/ForgetBoard";
 
@@ -20,16 +21,16 @@ export default async function PlayGamePage({ params }: PageProps) {
         <div className="mx-auto flex w-full max-w-2xl flex-1 items-center px-6 py-24">
           <ForgetBoard id={id} />
           <EmptyState
-            icon="🎯"
+            icon={<LostIcon />}
             title="This game doesn't exist yet"
             description="Double-check the link, or start a fresh board of your own."
             action={
-              <div className="flex gap-2">
-                <Link href="/new">
-                  <Button>Create a new game</Button>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Link href="/new" className={buttonClasses("primary")}>
+                  Create a new game
                 </Link>
-                <Link href="/game/demo">
-                  <Button variant="outline">Play the demo</Button>
+                <Link href="/game/demo" className={buttonClasses("outline")}>
+                  Play the demo
                 </Link>
               </div>
             }
@@ -43,7 +44,7 @@ export default async function PlayGamePage({ params }: PageProps) {
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-1 items-center px-6 py-24">
         <EmptyState
-          icon="⚠️"
+          icon={<AlertIcon />}
           title="Can't reach the database"
           description={
             err instanceof Error
@@ -51,8 +52,8 @@ export default async function PlayGamePage({ params }: PageProps) {
               : "Something went wrong loading this game. Check your database configuration and try again."
           }
           action={
-            <Link href="/">
-              <Button variant="outline">Back home</Button>
+            <Link href="/" className={buttonClasses("outline")}>
+              Back home
             </Link>
           }
         />

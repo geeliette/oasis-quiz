@@ -1,31 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fdf3f0;
-  --foreground: #2b1414;
+  --background: #fbfaf7;
+  --foreground: #1a1a1a;
 
-  /* Brand */
-  --color-primary: #dc2626;
-  --color-primary-dark: #991b1b;
-  --color-primary-light: #fca5a5;
+  /* Brand: ink outlines + flat "sticker" colours */
+  --color-primary: #1a1a1a;
+  --color-primary-dark: #000000;
+  --color-primary-light: #e4e1d9;
 
-  --color-accent: #fbbf24;
-  --color-accent-dark: #f59e0b;
-  --color-coral: #fb7185;
-  --color-teal: #2dd4bf;
-  --color-sky: #38bdf8;
+  --color-accent: #ffc53d;
+  --color-accent-dark: #e5a800;
+  --color-coral: #ff5a3c;
+  --color-teal: #3dd9a5;
+  --color-sky: #4da8ff;
+  --color-lilac: #b18cff;
 
   --color-surface: #ffffff;
-  --color-surface-soft: #fdf1f1;
-  --color-ink: #2b1414;
-  --color-ink-soft: #7a5b5b;
-  --color-ink-faint: #c4a3a3;
-  --color-border: #f3d9d9;
+  --color-surface-soft: #f3f1ec;
+  --color-ink: #1a1a1a;
+  --color-ink-soft: #4a4844;
+  --color-ink-faint: #6f6b63;
+  --color-border: #e4e1d9;
+  --color-line: #cfcbc2;
 
-  --color-success: #22c55e;
-  --color-success-dark: #15803d;
-  --color-danger: #ef4444;
-  --color-danger-dark: #b91c1c;
+  --color-success: #3dd9a5;
+  --color-success-dark: #12805a;
+  --color-danger: #e5432a;
+  --color-danger-dark: #b42d17;
 
   /* Stage (play screen) */
   --color-stage-start: #240a0a;
@@ -39,9 +41,12 @@
   --radius-lg: 1.25rem;
   --radius-xl: 1.75rem;
 
-  --shadow-soft: 0 2px 8px rgba(76, 29, 149, 0.08);
-  --shadow-card: 0 8px 24px rgba(76, 29, 149, 0.14);
-  --shadow-pop: 0 16px 40px rgba(76, 29, 149, 0.28);
+  --shadow-soft: 0 2px 8px rgba(26, 26, 26, 0.06);
+  --shadow-card: 0 8px 24px rgba(26, 26, 26, 0.1);
+  --shadow-pop: 0 16px 40px rgba(26, 26, 26, 0.2);
+  /* The signature hard, offset "sticker" shadow */
+  --shadow-hard: 4px 4px 0 var(--color-ink);
+  --shadow-hard-sm: 2px 2px 0 var(--color-ink);
 }
 
 @theme inline {
@@ -56,6 +61,7 @@
   --color-coral: var(--color-coral);
   --color-teal: var(--color-teal);
   --color-sky: var(--color-sky);
+  --color-lilac: var(--color-lilac);
 
   --color-surface: var(--color-surface);
   --color-surface-soft: var(--color-surface-soft);
@@ -63,6 +69,7 @@
   --color-ink-soft: var(--color-ink-soft);
   --color-ink-faint: var(--color-ink-faint);
   --color-border: var(--color-border);
+  --color-line: var(--color-line);
 
   --color-success: var(--color-success);
   --color-success-dark: var(--color-success-dark);
@@ -100,21 +107,20 @@ body {
 }
 
 ::selection {
-  background: var(--color-primary-light);
-  color: var(--color-primary-dark);
+  background: var(--color-accent);
+  color: var(--color-ink);
 }
 
-/* Playful scrollbar for the board / editor */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-primary-light) transparent;
+  scrollbar-color: var(--color-line) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: var(--color-primary-light);
+  background: var(--color-line);
   border-radius: 999px;
 }
 

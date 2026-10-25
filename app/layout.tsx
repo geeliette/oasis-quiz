@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import { Baloo_2, Nunito } from "next/font/google";
+import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const bodyFont = Nunito({
+const bodyFont = DM_Sans({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
 });
 
-const displayFont = Baloo_2({
+const displayFont = Bricolage_Grotesque({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
