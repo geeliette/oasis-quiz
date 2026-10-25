@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { RecentBoards } from "@/components/home/RecentBoards";
 
 const FEATURES = [
   {
@@ -63,6 +64,8 @@ export default function HomePage() {
             </Button>
           </Link>
         </div>
+
+        <RecentBoards />
 
         <div className="mt-24 grid w-full gap-5 sm:grid-cols-3">
           {FEATURES.map((f) => (

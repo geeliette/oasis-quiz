@@ -3,6 +3,7 @@ import { getGame } from "@/lib/store";
 import { PlayScreen } from "@/components/play/PlayScreen";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ForgetBoard } from "@/components/home/ForgetBoard";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -17,6 +18,7 @@ export default async function PlayGamePage({ params }: PageProps) {
     if (!game) {
       return (
         <div className="mx-auto flex w-full max-w-2xl flex-1 items-center px-6 py-24">
+          <ForgetBoard id={id} />
           <EmptyState
             icon="🎯"
             title="This game doesn't exist yet"

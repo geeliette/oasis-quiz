@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { Category, Game } from "@/lib/types";
 import { blankCategoryFactory, blankClue } from "@/lib/blank";
 import { ACTIVE_BOARD_TTL_DAYS } from "@/lib/expiry";
+import { rememberBoard } from "@/lib/recentBoards";
 import { validateGame, isReadyToPlay } from "@/lib/validation";
 import { useAutosaveGame } from "@/hooks/useAutosaveGame";
 import { CopyLinkField } from "@/components/ui/CopyLinkField";
@@ -42,6 +43,11 @@ export function BoardEditor({ initialGame }: { initialGame: Game }) {
     { title, categories },
     { enabled: true }
   );
+
+  // Only list the board under "Your boards" once it actually exists in the database.
+  useEffect(() => {
+    if (status === "saved") rememberBoard(initialGame.id, title);
+  }, [status, initialGame.id, title]);
 
   function updateCategoryName(catId: string, name: string) {
     setCategories((cs) => cs.map((c) => (c.id === catId ? { ...c, name } : c)));

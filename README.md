@@ -54,6 +54,8 @@ Team { id, name, color, score }
 
 Games expire automatically (Redis TTL, set in `lib/expiry.ts`): 90 days after they were last saved or opened, or 7 days for boards that were never filled in. New boards and demo copies aren't stored until their first edit.
 
+The home page's **Your boards** list (`lib/recentBoards.ts`) lives in the visitor's `localStorage`, not the database: a board is added once it's saved or its play screen is opened, and dropped if its link turns up "not found" (e.g. expired). It's per browser, so the share link is still the way to open a board elsewhere.
+
 ## Seed data
 
 The demo board (`/game/demo`) is built from `lib/demo.ts` on every request and is never saved, so each visitor sees the original board — play progress resets on reload and nobody can change it for others. Clicking **Edit a copy** on the demo saves a personal copy under a new id and opens it in the editor.

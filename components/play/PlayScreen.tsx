@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Category, Game, Team } from "@/lib/types";
 import { newId } from "@/lib/id";
@@ -11,6 +11,7 @@ import { GameBoard } from "./GameBoard";
 import { ClueModal } from "./ClueModal";
 import { Scoreboard, AddTeamPrompt } from "./Scoreboard";
 import { DEMO_GAME_ID } from "@/lib/demo";
+import { rememberBoard } from "@/lib/recentBoards";
 
 export function PlayScreen({ initialGame }: { initialGame: Game }) {
   const [categories, setCategories] = useState<Category[]>(initialGame.categories);
@@ -35,6 +36,10 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
     { categories, teams },
     { enabled: true, delay: 500 }
   );
+
+  useEffect(() => {
+    if (initialGame.id !== DEMO_GAME_ID) rememberBoard(initialGame.id, initialGame.title);
+  }, [initialGame.id, initialGame.title]);
 
   const activeCategory = useMemo(
     () => categories.find((c) => c.id === activeClueId?.categoryId) ?? null,
