@@ -47,14 +47,20 @@ function assertPersistenceAvailable() {
 
 // The demo board is never persisted: every visitor gets a fresh copy of the
 // original, and writes to it are dropped so nobody can change it for others.
-export async function getGame(id: string): Promise<Game | null> {
+//
+// Opening a board counts as using it, so by default this pushes its expiry
+// back. Pass refreshExpiry: false when a save follows anyway, since saveGame
+// resets the expiry itself and the extra call would be wasted.
+export async function getGame(
+  id: string,
+  { refreshExpiry = true }: { refreshExpiry?: boolean } = {}
+): Promise<Game | null> {
   if (id === DEMO_GAME_ID) return buildDemoGame();
   assertPersistenceAvailable();
   if (redis) {
     const game = await redis.get<Game>(`game:${id}`);
     if (!game) return null;
-    // Opening a board counts as using it, so push its expiry back.
-    await redis.expire(`game:${id}`, ttlSecondsFor(game));
+    if (refreshExpiry) await redis.expire(`game:${id}`, ttlSecondsFor(game));
     return game;
   }
   const all = await readFileStore();

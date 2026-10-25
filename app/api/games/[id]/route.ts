@@ -36,7 +36,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const existing = await getGame(id);
+    const existing = await getGame(id, { refreshExpiry: false });
     const now = Date.now();
 
     const game: Game = {
