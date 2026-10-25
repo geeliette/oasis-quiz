@@ -5,10 +5,10 @@ import clsx from "clsx";
 
 const baseFieldClasses =
   "w-full rounded-[12px] border-2 bg-white px-3.5 py-2.5 text-ink placeholder:text-ink-faint " +
-  "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60";
+  "transition-colors focus:outline-none focus:ring-2 focus:ring-accent";
 
 function borderClasses(hasError?: boolean) {
-  return hasError ? "border-danger focus:border-danger" : "border-border focus:border-ink";
+  return hasError ? "border-danger focus:border-danger" : "border-field focus:border-ink";
 }
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {

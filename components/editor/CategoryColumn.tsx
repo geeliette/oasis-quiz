@@ -1,8 +1,9 @@
 "use client";
 
 import type { Category } from "@/lib/types";
-import { Input, FieldError } from "@/components/ui/Field";
+import { FieldError } from "@/components/ui/Field";
 import type { FieldErrors } from "@/lib/validation";
+import { categoryColor } from "@/components/play/teamColors";
 import { ClueEditorCard } from "./ClueEditorCard";
 
 interface CategoryColumnProps {
@@ -20,8 +21,6 @@ interface CategoryColumnProps {
   ) => void;
 }
 
-const ACCENTS = ["#DC2626", "#FB7185", "#2DD4BF", "#38BDF8", "#FBBF24", "#22C55E"];
-
 export function CategoryColumn({
   category,
   index,
@@ -32,39 +31,39 @@ export function CategoryColumn({
   onRemoveClue,
   onClueChange,
 }: CategoryColumnProps) {
-  const accent = ACCENTS[index % ACCENTS.length];
+  const nameError = errors[`category.${category.id}.name`];
+  const color = categoryColor(index);
 
   return (
-    <div className="flex w-80 shrink-0 flex-col gap-3 rounded-lg border-2 border-border bg-surface-soft/40 p-3">
+    <div
+      className="flex w-80 shrink-0 flex-col gap-3 rounded-[20px] p-3"
+      // A faded wash of the category's colour behind its white question cards.
+      style={{ background: `color-mix(in srgb, ${color} 16%, var(--background))` }}
+    >
       <div
-        className="rounded-md px-3 py-2.5 text-white shadow-[var(--shadow-soft)]"
-        style={{ background: accent }}
+        className="flex items-center gap-1 rounded-[14px] border-2 border-ink p-1"
+        style={{ background: color }}
       >
-        <div className="flex items-center gap-2">
-          <Input
-            value={category.name}
-            onChange={(e) => onNameChange(e.target.value)}
-            placeholder={`Category ${index + 1}`}
-            className="!border-transparent !bg-white/15 !text-white placeholder:!text-white/70 font-display font-bold focus:!border-white/60"
-          />
-          <button
-            type="button"
-            onClick={onRemoveCategory}
-            aria-label="Remove category"
-            className="shrink-0 rounded-lg p-1.5 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M4 4l8 8M12 4l-8 8"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        </div>
+        <input
+          value={category.name}
+          onChange={(e) => onNameChange(e.target.value)}
+          placeholder={`Category ${index + 1}`}
+          aria-label={`Category ${index + 1} name`}
+          aria-invalid={!!nameError}
+          className="h-11 min-w-0 flex-1 rounded-[10px] bg-transparent px-2.5 font-display text-lg font-extrabold text-ink outline-none placeholder:text-ink/60 hover:bg-white/30 focus:bg-white focus:ring-2 focus:ring-ink"
+        />
+        <button
+          type="button"
+          onClick={onRemoveCategory}
+          aria-label={`Remove ${category.name || `category ${index + 1}`}`}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] text-ink transition-colors hover:bg-white/40"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
       </div>
-      <FieldError>{errors[`category.${category.id}.name`]}</FieldError>
+      <FieldError>{nameError}</FieldError>
       <FieldError>{errors[`category.${category.id}.clues`]}</FieldError>
 
       <div className="flex flex-col gap-3">
@@ -82,7 +81,7 @@ export function CategoryColumn({
       <button
         type="button"
         onClick={onAddClue}
-        className="rounded-md border-2 border-dashed border-border py-2 text-sm font-bold text-ink-soft transition-colors hover:border-primary/40 hover:text-primary"
+        className="min-h-11 rounded-[14px] border-2 border-dashed border-field font-bold text-ink-soft transition-colors hover:border-ink hover:bg-white hover:text-ink"
       >
         + Add question
       </button>

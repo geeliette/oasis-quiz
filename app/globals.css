@@ -23,6 +23,8 @@
   --color-ink-faint: #6f6b63;
   --color-border: #e4e1d9;
   --color-line: #cfcbc2;
+  /* Input borders: dark enough (3:1 on white) to read as editable */
+  --color-field: #959085;
 
   --color-success: #3dd9a5;
   --color-success-dark: #12805a;
@@ -63,6 +65,7 @@
   --color-ink-faint: var(--color-ink-faint);
   --color-border: var(--color-border);
   --color-line: var(--color-line);
+  --color-field: var(--color-field);
 
   --color-success: var(--color-success);
   --color-success-dark: var(--color-success-dark);
