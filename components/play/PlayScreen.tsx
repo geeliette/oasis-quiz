@@ -10,6 +10,7 @@ import { SaveStatusIndicator } from "@/components/ui/SaveStatus";
 import { GameBoard } from "./GameBoard";
 import { ClueModal } from "./ClueModal";
 import { Scoreboard, AddTeamPrompt } from "./Scoreboard";
+import { DEMO_GAME_ID } from "@/lib/demo";
 
 export function PlayScreen({ initialGame }: { initialGame: Game }) {
   const [categories, setCategories] = useState<Category[]>(initialGame.categories);
@@ -181,7 +182,7 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
             href={`/game/${initialGame.id}/edit`}
             className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-bold text-white/80 transition-colors hover:bg-white/20"
           >
-            Edit board
+            {initialGame.id === DEMO_GAME_ID ? "Edit a copy" : "Edit board"}
           </Link>
         </div>
       </header>

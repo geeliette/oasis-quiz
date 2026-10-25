@@ -84,7 +84,7 @@ export function CategoryColumn({
         onClick={onAddClue}
         className="rounded-md border-2 border-dashed border-border py-2 text-sm font-bold text-ink-soft transition-colors hover:border-primary/40 hover:text-primary"
       >
-        + Add clue
+        + Add question
       </button>
     </div>
   );

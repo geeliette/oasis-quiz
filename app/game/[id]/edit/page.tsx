@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { buildBlankGame } from "@/lib/blank";
-import { getGame } from "@/lib/store";
+import { DEMO_GAME_ID, buildDemoGame } from "@/lib/demo";
+import { newGameId } from "@/lib/id";
+import { getGame, saveGame } from "@/lib/store";
 import { BoardEditor } from "@/components/editor/BoardEditor";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -13,6 +16,21 @@ interface PageProps {
 export default async function EditGamePage({ params, searchParams }: PageProps) {
   const { id } = await params;
   const { new: isNewFlag } = await searchParams;
+
+  // The demo can't be edited in place, so editing it starts a personal copy.
+  // redirect() throws, so it has to run outside the try/catch below.
+  let copyId: string | null = null;
+
+  try {
+    if (id === DEMO_GAME_ID) {
+      copyId = newGameId();
+      await saveGame({ ...buildDemoGame(), id: copyId });
+    }
+  } catch (err) {
+    return <DatabaseError err={err} />;
+  }
+
+  if (copyId) redirect(`/game/${copyId}/edit`);
 
   try {
     let game = await getGame(id);
@@ -40,23 +58,27 @@ export default async function EditGamePage({ params, searchParams }: PageProps) 
 
     return <BoardEditor initialGame={game} />;
   } catch (err) {
-    return (
-      <div className="mx-auto flex w-full max-w-2xl flex-1 items-center px-6 py-24">
-        <EmptyState
-          icon="⚠️"
-          title="Can't reach the database"
-          description={
-            err instanceof Error
-              ? err.message
-              : "Something went wrong loading this game. Check your database configuration and try again."
-          }
-          action={
-            <Link href="/">
-              <Button variant="outline">Back home</Button>
-            </Link>
-          }
-        />
-      </div>
-    );
+    return <DatabaseError err={err} />;
   }
+}
+
+function DatabaseError({ err }: { err: unknown }) {
+  return (
+    <div className="mx-auto flex w-full max-w-2xl flex-1 items-center px-6 py-24">
+      <EmptyState
+        icon="⚠️"
+        title="Can't reach the database"
+        description={
+          err instanceof Error
+            ? err.message
+            : "Something went wrong loading this game. Check your database configuration and try again."
+        }
+        action={
+          <Link href="/">
+            <Button variant="outline">Back home</Button>
+          </Link>
+        }
+      />
+    </div>
+  );
 }

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { DEMO_GAME_ID, buildDemoGame } from "@/lib/demo";
-import { getGame, saveGame } from "@/lib/store";
+import { getGame } from "@/lib/store";
 import { PlayScreen } from "@/components/play/PlayScreen";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -13,12 +12,7 @@ export default async function PlayGamePage({ params }: PageProps) {
   const { id } = await params;
 
   try {
-    let game = await getGame(id);
-
-    if (!game && id === DEMO_GAME_ID) {
-      game = buildDemoGame();
-      await saveGame(game);
-    }
+    const game = await getGame(id);
 
     if (!game) {
       return (

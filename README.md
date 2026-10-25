@@ -54,4 +54,4 @@ Team { id, name, color, score }
 
 ## Seed data
 
-A demo board (`/game/demo`) is lazily created the first time it's requested, so the app never looks empty on first load — no manual seeding step required.
+The demo board (`/game/demo`) is built from `lib/demo.ts` on every request and is never saved, so each visitor sees the original board — play progress resets on reload and nobody can change it for others. Clicking **Edit a copy** on the demo saves a personal copy under a new id and opens it in the editor.

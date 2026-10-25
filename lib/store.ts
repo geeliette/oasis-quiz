@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { Redis } from "@upstash/redis";
+import { DEMO_GAME_ID, buildDemoGame } from "./demo";
 import type { Game } from "./types";
 
 const REDIS_URL =
@@ -43,7 +44,10 @@ function assertPersistenceAvailable() {
   }
 }
 
+// The demo board is never persisted: every visitor gets a fresh copy of the
+// original, and writes to it are dropped so nobody can change it for others.
 export async function getGame(id: string): Promise<Game | null> {
+  if (id === DEMO_GAME_ID) return buildDemoGame();
   assertPersistenceAvailable();
   if (redis) {
     const game = await redis.get<Game>(`game:${id}`);
@@ -54,6 +58,7 @@ export async function getGame(id: string): Promise<Game | null> {
 }
 
 export async function saveGame(game: Game): Promise<void> {
+  if (game.id === DEMO_GAME_ID) return;
   assertPersistenceAvailable();
   if (redis) {
     await redis.set(`game:${game.id}`, game);

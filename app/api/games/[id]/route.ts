@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { DEMO_GAME_ID, buildDemoGame } from "@/lib/demo";
 import { getGame, saveGame } from "@/lib/store";
 import type { Game, GameUpdate } from "@/lib/types";
 
@@ -11,12 +10,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
   try {
-    let game = await getGame(id);
-
-    if (!game && id === DEMO_GAME_ID) {
-      game = buildDemoGame();
-      await saveGame(game);
-    }
+    const game = await getGame(id);
 
     if (!game) {
       return NextResponse.json({ error: "Game not found" }, { status: 404 });
