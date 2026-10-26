@@ -18,9 +18,9 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import type { Category } from "@/lib/types";
-import { FieldError } from "@/components/ui/Field";
+import { FieldError, CharCount } from "@/components/ui/Field";
 import { GripIcon } from "@/components/ui/Icons";
-import type { FieldErrors } from "@/lib/validation";
+import { LIMITS, type FieldErrors } from "@/lib/validation";
 import { resolveCategoryColor } from "@/components/play/teamColors";
 import { ClueEditorCard } from "./ClueEditorCard";
 import { ColorPicker } from "./ColorPicker";
@@ -103,6 +103,7 @@ export function CategoryColumn({
           onChange={(e) => onNameChange(e.target.value)}
           placeholder={`Category ${index + 1}`}
           aria-label={`Category ${index + 1} name`}
+          maxLength={LIMITS.categoryName}
           aria-invalid={!!nameError}
           className="h-11 min-w-0 flex-1 rounded-[10px] bg-transparent px-2 font-display text-lg font-extrabold text-ink outline-none placeholder:text-ink/60 hover:bg-white/30 focus:bg-white focus:ring-2 focus:ring-ink"
         />
@@ -119,6 +120,7 @@ export function CategoryColumn({
         </button>
       </div>
       <FieldError>{nameError}</FieldError>
+      <CharCount value={category.name} max={LIMITS.categoryName} />
       <FieldError>{errors[`category.${category.id}.clues`]}</FieldError>
 
       <DndContext

@@ -22,12 +22,12 @@ import type { Category, Game } from "@/lib/types";
 import { blankCategoryFactory, blankClue } from "@/lib/blank";
 import { ACTIVE_BOARD_TTL_DAYS } from "@/lib/expiry";
 import { rememberBoard } from "@/lib/recentBoards";
-import { validateGame, isReadyToPlay } from "@/lib/validation";
+import { LIMITS, validateGame, isReadyToPlay } from "@/lib/validation";
 import { useAutosaveGame } from "@/hooks/useAutosaveGame";
 import { CopyLinkField } from "@/components/ui/CopyLinkField";
 import { SaveStatusIndicator } from "@/components/ui/SaveStatus";
 import { Button } from "@/components/ui/Button";
-import { FieldError } from "@/components/ui/Field";
+import { FieldError, CharCount } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { EmptyBoardIcon } from "@/components/ui/Icons";
 import { LogoMark } from "@/components/ui/Logo";
@@ -203,9 +203,11 @@ export function BoardEditor({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Untitled Game"
               aria-label="Board title"
+              maxLength={LIMITS.title}
               className="w-full rounded-[10px] bg-transparent px-1 font-display text-2xl font-extrabold tracking-tight text-ink outline-none placeholder:text-ink-faint focus-visible:ring-2 focus-visible:ring-accent sm:text-[28px]"
             />
             <FieldError>{visibleErrors.title}</FieldError>
+            <CharCount value={title} max={LIMITS.title} className="text-left" />
           </div>
 
           {(ready || showErrors) && (

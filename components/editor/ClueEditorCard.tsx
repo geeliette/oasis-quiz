@@ -5,8 +5,8 @@ import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import type { Clue } from "@/lib/types";
 import { GripIcon } from "@/components/ui/Icons";
-import { TextArea, FieldError } from "@/components/ui/Field";
-import type { FieldErrors } from "@/lib/validation";
+import { TextArea, FieldError, CharCount } from "@/components/ui/Field";
+import { LIMITS, type FieldErrors } from "@/lib/validation";
 
 interface ClueEditorCardProps {
   clue: Clue;
@@ -75,6 +75,7 @@ export function ClueEditorCard({ clue, errors, onChange, onRemove }: ClueEditorC
       {FIELDS.map(({ field, label, optional, placeholder }) => {
         const id = `${clue.id}-${field}`;
         const error = errors[`clue.${clue.id}.${field}`];
+        const value = field === "hint" ? (clue.hint ?? "") : clue[field];
         return (
           <div key={field} className="flex flex-col gap-1">
             <label htmlFor={id} className="text-sm font-bold text-ink">
@@ -83,14 +84,16 @@ export function ClueEditorCard({ clue, errors, onChange, onRemove }: ClueEditorC
             </label>
             <TextArea
               id={id}
-              value={field === "hint" ? (clue.hint ?? "") : clue[field]}
+              value={value}
               onChange={(e) => onChange(field, e.target.value)}
               placeholder={placeholder}
+              maxLength={LIMITS[field]}
               rows={2}
               error={error}
               className="text-[15px] leading-snug"
             />
             <FieldError>{error}</FieldError>
+            <CharCount value={value} max={LIMITS[field]} />
           </div>
         );
       })}

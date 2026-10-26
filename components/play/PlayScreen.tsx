@@ -156,7 +156,7 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
           >
             <LogoMark size={30} />
           </Link>
-          <h1 className="truncate font-display text-[19px] font-extrabold text-ink sm:text-2xl">
+          <h1 className="line-clamp-2 break-words font-display text-[19px] font-extrabold leading-tight text-ink sm:block sm:truncate sm:text-2xl sm:leading-8">
             {initialGame.title || "Untitled Game"}
           </h1>
           <span className="hidden shrink-0 text-sm text-ink-faint md:inline">

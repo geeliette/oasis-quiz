@@ -55,3 +55,22 @@ export function FieldError({ children }: { children?: string }) {
     </p>
   );
 }
+
+/** Shows "used / max" once a field is close to its limit, in red if over. */
+export function CharCount({ value, max, className }: { value: string; max: number; className?: string }) {
+  if (value.length < max * 0.8) return null;
+  const over = value.length > max;
+  return (
+    <p
+      aria-live="polite"
+      className={clsx(
+        "text-right text-xs font-semibold tabular-nums",
+        over ? "text-danger" : "text-ink-faint",
+        className
+      )}
+    >
+      {value.length} / {max}
+      {over && " · please shorten"}
+    </p>
+  );
+}
