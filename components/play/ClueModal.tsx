@@ -70,8 +70,9 @@ export function ClueModal({
     "absolute rounded-[12px] border-2 border-ink px-3 py-1.5 text-xs font-bold uppercase tracking-wider sm:px-4 sm:py-2 sm:text-[15px]";
   const valueSticker =
     "absolute -right-2 -top-6 flex h-14 w-14 rotate-[8deg] items-center justify-center rounded-full border-2 border-ink bg-accent font-display text-xl font-extrabold sm:right-10 sm:-top-7 sm:h-[76px] sm:w-[76px] sm:text-[26px]";
+  // Both faces share one grid cell so the card grows to fit the taller one.
   const face =
-    "backface-hidden absolute inset-0 flex flex-col items-center justify-center rounded-[24px] border-2 border-ink bg-white px-5 pb-8 pt-12 text-center shadow-[8px_8px_0_var(--color-ink)] sm:rounded-[32px] sm:px-14 sm:pb-14 sm:pt-[72px] sm:shadow-[10px_10px_0_var(--color-ink)]";
+    "backface-hidden relative col-start-1 row-start-1 flex flex-col items-center justify-center rounded-[24px] border-2 border-ink bg-white px-5 pb-8 pt-12 text-center shadow-[8px_8px_0_var(--color-ink)] sm:rounded-[32px] sm:px-14 sm:pb-14 sm:pt-[72px] sm:shadow-[10px_10px_0_var(--color-ink)]";
 
   return (
     <AnimatePresence>
@@ -144,7 +145,7 @@ export function ClueModal({
 
         <div className="perspective flex w-full flex-1 items-center justify-center py-6">
           <motion.div
-            className="preserve-3d relative min-h-[420px] w-full max-w-[920px] cursor-pointer sm:min-h-[460px]"
+            className="preserve-3d relative grid min-h-[420px] w-full max-w-[920px] cursor-pointer sm:min-h-[460px]"
             style={{ transformStyle: "preserve-3d" }}
             animate={{ rotateY: phase === "answer" ? 180 : 0 }}
             transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
@@ -160,7 +161,12 @@ export function ClueModal({
               </span>
               <span className={valueSticker}>{clue.value}</span>
 
-              <p className="whitespace-pre-line font-display text-[28px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[52px] sm:leading-[1.1]">
+              <p
+                className={clsx(
+                  "whitespace-pre-line font-display font-extrabold leading-tight tracking-[-0.02em] sm:leading-[1.1]",
+                  questionSize(clue.question)
+                )}
+              >
                 {clue.question}
               </p>
               {hintShown && hasHint && (
@@ -216,7 +222,12 @@ export function ClueModal({
               </span>
               <span className={valueSticker}>{clue.value}</span>
 
-              <p className="whitespace-pre-line font-display text-2xl font-extrabold leading-tight sm:text-[40px]">
+              <p
+                className={clsx(
+                  "whitespace-pre-line font-display font-extrabold leading-tight",
+                  answerSize(clue.answer)
+                )}
+              >
                 {clue.answer}
               </p>
 
@@ -263,4 +274,19 @@ export function ClueModal({
       </motion.div>
     </AnimatePresence>
   );
+}
+
+// Step the type down for longer text so it stays readable without the card
+// growing taller than the screen.
+function questionSize(text: string) {
+  if (text.length > 220) return "text-xl sm:text-[30px]";
+  if (text.length > 140) return "text-[22px] sm:text-[36px]";
+  if (text.length > 80) return "text-2xl sm:text-[44px]";
+  return "text-[28px] sm:text-[52px]";
+}
+
+function answerSize(text: string) {
+  if (text.length > 160) return "text-lg sm:text-[26px]";
+  if (text.length > 80) return "text-xl sm:text-[32px]";
+  return "text-2xl sm:text-[40px]";
 }
