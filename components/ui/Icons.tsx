@@ -48,3 +48,12 @@ export function GripIcon({ size = 16 }: { size?: number }) {
     </svg>
   );
 }
+
+export function TimerIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden>
+      <circle cx="8" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8 6.2V9l1.8 1.2M6.5 1.8h3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

@@ -7,11 +7,14 @@ import type { Clue } from "@/lib/types";
 import { GripIcon } from "@/components/ui/Icons";
 import { TextArea, FieldError, CharCount } from "@/components/ui/Field";
 import { LIMITS, type FieldErrors } from "@/lib/validation";
+import { TimerSelect } from "./TimerSelect";
 
 interface ClueEditorCardProps {
   clue: Clue;
   errors: FieldErrors;
+  defaultTimeLimit: number;
   onChange: (field: "value" | "question" | "hint" | "answer", value: string) => void;
+  onTimeLimitChange: (timeLimit: number | undefined) => void;
   onRemove: () => void;
 }
 
@@ -21,7 +24,14 @@ const FIELDS = [
   { field: "answer", label: "Answer", optional: false, placeholder: "The correct answer…" },
 ] as const;
 
-export function ClueEditorCard({ clue, errors, onChange, onRemove }: ClueEditorCardProps) {
+export function ClueEditorCard({
+  clue,
+  errors,
+  defaultTimeLimit,
+  onChange,
+  onTimeLimitChange,
+  onRemove,
+}: ClueEditorCardProps) {
   const valueError = errors[`clue.${clue.id}.value`];
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
     useSortable({ id: clue.id });
@@ -97,6 +107,19 @@ export function ClueEditorCard({ clue, errors, onChange, onRemove }: ClueEditorC
           </div>
         );
       })}
+
+      <div className="flex items-center justify-between gap-2">
+        <label htmlFor={`${clue.id}-timer`} className="text-sm font-bold text-ink">
+          Timer
+        </label>
+        <TimerSelect
+          id={`${clue.id}-timer`}
+          value={clue.timeLimit}
+          onChange={onTimeLimitChange}
+          boardDefault={defaultTimeLimit}
+          className="w-48"
+        />
+      </div>
     </div>
   );
 }

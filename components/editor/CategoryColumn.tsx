@@ -29,6 +29,7 @@ interface CategoryColumnProps {
   category: Category;
   index: number;
   errors: FieldErrors;
+  defaultTimeLimit: number;
   onNameChange: (name: string) => void;
   onColorChange: (color: string) => void;
   onRemoveCategory: () => void;
@@ -40,12 +41,14 @@ interface CategoryColumnProps {
     field: "value" | "question" | "hint" | "answer",
     value: string
   ) => void;
+  onClueTimeLimitChange: (clueId: string, timeLimit: number | undefined) => void;
 }
 
 export function CategoryColumn({
   category,
   index,
   errors,
+  defaultTimeLimit,
   onNameChange,
   onColorChange,
   onRemoveCategory,
@@ -53,6 +56,7 @@ export function CategoryColumn({
   onRemoveClue,
   onMoveClue,
   onClueChange,
+  onClueTimeLimitChange,
 }: CategoryColumnProps) {
   const nameError = errors[`category.${category.id}.name`];
   const color = resolveCategoryColor(category, index);
@@ -136,7 +140,9 @@ export function CategoryColumn({
                 key={clue.id}
                 clue={clue}
                 errors={errors}
+                defaultTimeLimit={defaultTimeLimit}
                 onChange={(field, value) => onClueChange(clue.id, field, value)}
+                onTimeLimitChange={(timeLimit) => onClueTimeLimitChange(clue.id, timeLimit)}
                 onRemove={() => onRemoveClue(clue.id)}
               />
             ))}

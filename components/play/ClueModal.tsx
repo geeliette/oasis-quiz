@@ -5,11 +5,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import clsx from "clsx";
 import type { Category, Clue, Team } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
+import { QuestionTimer } from "./QuestionTimer";
 
 interface ClueModalProps {
   category: Category;
   categoryColor: string;
   clue: Clue;
+  /** Seconds for this question's timer; 0 means it has none. */
+  timeLimit: number;
   teams: Team[];
   onAward: (teamId: string, delta: number) => void;
   onClose: () => void;
@@ -21,6 +24,7 @@ export function ClueModal({
   category,
   categoryColor,
   clue,
+  timeLimit,
   teams,
   onAward,
   onClose,
@@ -179,6 +183,7 @@ export function ClueModal({
                   </p>
                 </div>
               )}
+              {timeLimit > 0 && <QuestionTimer seconds={timeLimit} frozen={phase === "answer"} />}
               <div className="flex flex-wrap items-center justify-center gap-3.5">
                 {hasHint && !hintShown && (
                   <Button
@@ -208,6 +213,15 @@ export function ClueModal({
                   Space
                 </kbd>{" "}
                 to reveal
+                {timeLimit > 0 && (
+                  <>
+                    {" · "}
+                    <kbd className="rounded-md bg-surface-soft px-2 py-0.5 font-sans font-bold text-ink">
+                      T
+                    </kbd>{" "}
+                    to start or pause the timer
+                  </>
+                )}
               </p>
             </div>
 
