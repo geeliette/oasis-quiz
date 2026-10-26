@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGame, saveGame } from "@/lib/store";
 import type { Game, GameUpdate } from "@/lib/types";
-import { MAX_BODY_BYTES, findTooLongFields } from "@/lib/validation";
+import { MAX_BODY_BYTES, findInvalidTimeLimits, findTooLongFields } from "@/lib/validation";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -44,6 +44,11 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Invalid game data" }, { status: 400 });
   }
 
+  const invalidTimers = findInvalidTimeLimits(body);
+  if (invalidTimers.length > 0) {
+    return NextResponse.json({ error: "Invalid timer setting", fields: invalidTimers }, { status: 400 });
+  }
+
   try {
     const existing = await getGame(id, { refreshExpiry: false });
 
@@ -58,6 +63,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       title: body.title ?? existing?.title ?? "",
       categories: body.categories ?? existing?.categories ?? [],
       teams: body.teams ?? existing?.teams ?? [],
+      defaultTimeLimit: body.defaultTimeLimit ?? existing?.defaultTimeLimit,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };

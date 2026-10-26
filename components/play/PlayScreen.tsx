@@ -15,6 +15,7 @@ import { Scoreboard, AddTeamPrompt } from "./Scoreboard";
 import { DEMO_GAME_ID } from "@/lib/demo";
 import { buttonClasses } from "@/components/ui/buttonStyles";
 import { rememberBoard } from "@/lib/recentBoards";
+import { effectiveTimeLimit } from "@/lib/timer";
 
 export function PlayScreen({ initialGame }: { initialGame: Game }) {
   const [categories, setCategories] = useState<Category[]>(initialGame.categories);
@@ -256,6 +257,7 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
           category={activeCategory}
           categoryColor={resolveCategoryColor(activeCategory, categories.indexOf(activeCategory))}
           clue={activeClue}
+          timeLimit={effectiveTimeLimit(activeClue, initialGame)}
           teams={teams}
           onAward={handleAward}
           onClose={handleCloseClue}

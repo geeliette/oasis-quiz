@@ -1,3 +1,4 @@
+import { isValidTimeLimit } from "./timer";
 import type { Category, Game, GameUpdate } from "./types";
 
 /** Character limits for board text, shared by the editor and the save API. */
@@ -90,4 +91,20 @@ export function findTooLongFields(update: GameUpdate, existing: Game | null): st
     }
   }
   return tooLong;
+}
+
+/** Lists the timer settings in a save that aren't 0 or a whole number of seconds in range. */
+export function findInvalidTimeLimits(update: GameUpdate): string[] {
+  const invalid: string[] = [];
+  if (update.defaultTimeLimit !== undefined && !isValidTimeLimit(update.defaultTimeLimit)) {
+    invalid.push("defaultTimeLimit");
+  }
+  for (const cat of update.categories ?? []) {
+    for (const clue of cat.clues ?? []) {
+      if (clue.timeLimit !== undefined && !isValidTimeLimit(clue.timeLimit)) {
+        invalid.push(`clue.${clue.id}.timeLimit`);
+      }
+    }
+  }
+  return invalid;
 }

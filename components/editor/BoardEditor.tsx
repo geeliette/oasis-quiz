@@ -33,6 +33,7 @@ import { EmptyBoardIcon } from "@/components/ui/Icons";
 import { LogoMark } from "@/components/ui/Logo";
 import { CATEGORY_COLORS, resolveCategoryColor } from "@/components/play/teamColors";
 import { CategoryColumn } from "./CategoryColumn";
+import { TimerSelect } from "./TimerSelect";
 
 function noopSubscribe() {
   return () => {};
@@ -68,6 +69,7 @@ export function BoardEditor({
   const [categories, setCategories] = useState<Category[]>(() =>
     withColors(initialGame.categories)
   );
+  const [defaultTimeLimit, setDefaultTimeLimit] = useState(initialGame.defaultTimeLimit ?? 0);
   const [navigating, setNavigating] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
 
@@ -88,7 +90,9 @@ export function BoardEditor({
   // though, or a demo copy would lose the demo's teams.
   const { status, saveNow } = useAutosaveGame(
     initialGame.id,
-    unsaved ? { title, categories, teams: initialGame.teams } : { title, categories },
+    unsaved
+      ? { title, categories, defaultTimeLimit, teams: initialGame.teams }
+      : { title, categories, defaultTimeLimit },
     { enabled: true }
   );
 
@@ -163,6 +167,20 @@ export function BoardEditor({
                   ? cl
                   : { ...cl, [field]: field === "value" ? Number(value) || 0 : value }
               ),
+            }
+      )
+    );
+  }
+
+  function updateClueTimeLimit(catId: string, clueId: string, timeLimit: number | undefined) {
+    setCategories((cs) =>
+      cs.map((c) =>
+        c.id !== catId
+          ? c
+          : {
+              ...c,
+              // An undefined timeLimit is dropped when saved, meaning "use the board default".
+              clues: c.clues.map((cl) => (cl.id === clueId ? { ...cl, timeLimit } : cl)),
             }
       )
     );
@@ -249,6 +267,20 @@ export function BoardEditor({
 
       <main className="flex-1 px-4 py-6 sm:px-6">
         <div className="mx-auto max-w-[1500px]">
+          <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <label htmlFor="default-timer" className="text-sm font-bold text-ink">
+              Timer for every question
+            </label>
+            <TimerSelect
+              id="default-timer"
+              value={defaultTimeLimit}
+              onChange={(value) => setDefaultTimeLimit(value ?? 0)}
+              className="w-36"
+            />
+            <span className="text-sm text-ink-faint">
+              Individual questions can override this.
+            </span>
+          </div>
           {categories.length === 0 ? (
             <EmptyState
               icon={<EmptyBoardIcon />}
@@ -274,6 +306,7 @@ export function BoardEditor({
                       category={category}
                       index={i}
                       errors={visibleErrors}
+                      defaultTimeLimit={defaultTimeLimit}
                       onNameChange={(name) => updateCategoryName(category.id, name)}
                       onColorChange={(color) => updateCategoryColor(category.id, color)}
                       onRemoveCategory={() => removeCategory(category.id)}
@@ -282,6 +315,9 @@ export function BoardEditor({
                       onMoveClue={(activeId, overId) => moveClue(category.id, activeId, overId)}
                       onClueChange={(clueId, field, value) =>
                         updateClue(category.id, clueId, field, value)
+                      }
+                      onClueTimeLimitChange={(clueId, timeLimit) =>
+                        updateClueTimeLimit(category.id, clueId, timeLimit)
                       }
                     />
                   ))}
