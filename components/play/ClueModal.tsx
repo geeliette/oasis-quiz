@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import clsx from "clsx";
 import type { Category, Clue, Team } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
-import { QuestionTimer } from "./QuestionTimer";
+import { QuestionTimer, isFromFormControl } from "./QuestionTimer";
 
 interface ClueModalProps {
   category: Category;
@@ -14,6 +14,7 @@ interface ClueModalProps {
   /** Seconds for this question's timer; 0 means it has none. */
   timeLimit: number;
   teams: Team[];
+  onTimeLimitChange: (seconds: number) => void;
   onAward: (teamId: string, delta: number) => void;
   onClose: () => void;
   onCancel: () => void;
@@ -26,6 +27,7 @@ export function ClueModal({
   clue,
   timeLimit,
   teams,
+  onTimeLimitChange,
   onAward,
   onClose,
   onCancel,
@@ -54,6 +56,8 @@ export function ClueModal({
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
+      // Let a focused dropdown (the timer length) handle its own keys.
+      if (isFromFormControl(e) && e.code !== "Escape") return;
       if (e.code === "Space" || e.code === "Enter") {
         e.preventDefault();
         advance();
@@ -183,7 +187,13 @@ export function ClueModal({
                   </p>
                 </div>
               )}
-              {timeLimit > 0 && <QuestionTimer seconds={timeLimit} frozen={phase === "answer"} />}
+              {/* Keyed by length so changing it starts the countdown afresh. */}
+              <QuestionTimer
+                key={timeLimit}
+                seconds={timeLimit}
+                frozen={phase === "answer"}
+                onChangeSeconds={onTimeLimitChange}
+              />
               <div className="flex flex-wrap items-center justify-center gap-3.5">
                 {hasHint && !hintShown && (
                   <Button

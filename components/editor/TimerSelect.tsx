@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { TIMER_PRESETS, formatDuration } from "@/lib/timer";
+import { formatDuration, timerOptions } from "@/lib/timer";
 import { TimerIcon } from "@/components/ui/Icons";
 
 const DEFAULT = "default";
@@ -24,9 +24,6 @@ export function TimerSelect({
   className?: string;
 }) {
   const usesDefault = boardDefault !== undefined;
-  // Keep a time that isn't a preset (e.g. set through the API) selectable.
-  const presets =
-    value && !TIMER_PRESETS.includes(value) ? [...TIMER_PRESETS, value].sort((a, b) => a - b) : TIMER_PRESETS;
 
   return (
     <div
@@ -50,7 +47,7 @@ export function TimerSelect({
           </option>
         )}
         <option value="0">No timer</option>
-        {presets.map((s) => (
+        {timerOptions(value).map((s) => (
           <option key={s} value={s}>
             {formatDuration(s)}
           </option>

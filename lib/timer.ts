@@ -3,6 +3,13 @@ import type { Clue, Game } from "./types";
 /** Times the editor offers, in seconds. */
 export const TIMER_PRESETS = [10, 15, 20, 30, 45, 60, 90, 120];
 
+/** The presets, plus `value` if it isn't one (e.g. a time set through the API). */
+export function timerOptions(value: number | undefined): number[] {
+  return value && !TIMER_PRESETS.includes(value)
+    ? [...TIMER_PRESETS, value].sort((a, b) => a - b)
+    : TIMER_PRESETS;
+}
+
 export const TIME_LIMIT_MIN = 5;
 export const TIME_LIMIT_MAX = 600;
 

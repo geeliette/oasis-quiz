@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { formatClock } from "@/lib/timer";
+import { formatClock, formatDuration, timerOptions } from "@/lib/timer";
 import { Button } from "@/components/ui/Button";
 import { TimerIcon } from "@/components/ui/Icons";
 
@@ -10,11 +10,27 @@ type Status = "idle" | "running" | "paused" | "done";
 
 const WARNING_SECONDS = 5;
 
+/** True when a key press belongs to a form control (e.g. a focused dropdown), not the card. */
+export function isFromFormControl(e: KeyboardEvent) {
+  return e.target instanceof Element && !!e.target.closest("select, input, textarea");
+}
+
 /**
- * A countdown the host starts by hand. `frozen` stops it for good once the
- * answer is revealed, leaving the last time on screen as the card flips.
+ * A countdown the host starts by hand. Before it starts, the host can change
+ * the length (or add a timer to an untimed question) via `onChangeSeconds`.
+ * `frozen` stops it for good once the answer is revealed, leaving the last
+ * time on screen as the card flips.
  */
-export function QuestionTimer({ seconds, frozen }: { seconds: number; frozen: boolean }) {
+export function QuestionTimer({
+  seconds,
+  frozen,
+  onChangeSeconds,
+}: {
+  /** 0 means the question has no timer. */
+  seconds: number;
+  frozen: boolean;
+  onChangeSeconds: (seconds: number) => void;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [remainingMs, setRemainingMs] = useState(seconds * 1000);
   // When the running countdown hits zero; measuring against the clock keeps it
@@ -57,34 +73,94 @@ export function QuestionTimer({ seconds, frozen }: { seconds: number; frozen: bo
   useEffect(() => {
     if (frozen) return;
     function handleKey(e: KeyboardEvent) {
-      if (e.code !== "KeyT" || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.code !== "KeyT" || e.repeat || e.metaKey || e.ctrlKey || e.altKey || isFromFormControl(e)) return;
+      if (seconds === 0) return;
       e.preventDefault();
       toggle();
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [frozen, status, remainingMs]);
+  }, [frozen, status, remainingMs, seconds]);
 
   const secondsLeft = Math.ceil(remainingMs / 1000);
   const done = status === "done";
   const warning = done || (status !== "idle" && secondsLeft <= WARNING_SECONDS);
 
   // Clicks here shouldn't fall through to the card, which would reveal the answer.
+  if (seconds === 0) {
+    if (frozen) return null;
+    return (
+      <label
+        className="relative inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-[10px] px-3 text-sm font-bold text-ink-faint transition-colors focus-within:ring-2 focus-within:ring-accent hover:bg-surface-soft hover:text-ink"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <TimerIcon />
+        Add timer
+        <select
+          value=""
+          onChange={(e) => onChangeSeconds(Number(e.target.value))}
+          aria-label="Add a timer to this question"
+          className="absolute inset-0 cursor-pointer opacity-0"
+        >
+          <option value="" disabled>
+            Add timer
+          </option>
+          {timerOptions(undefined).map((s) => (
+            <option key={s} value={s}>
+              {formatDuration(s)}
+            </option>
+          ))}
+        </select>
+      </label>
+    );
+  }
+
   if (status === "idle") {
     return (
-      <Button
-        variant="outline"
-        size="lg"
-        disabled={frozen}
-        onClick={(e) => {
-          e.stopPropagation();
-          start();
-        }}
+      <div
+        className={clsx(
+          "inline-flex min-h-[52px] items-stretch rounded-[14px] border-2 border-ink bg-white text-[1.05rem] font-bold shadow-[var(--shadow-hard)]",
+          frozen && "pointer-events-none opacity-40 shadow-none"
+        )}
+        onClick={(e) => e.stopPropagation()}
       >
-        <TimerIcon size={18} />
-        Start timer · {formatClock(seconds)}
-      </Button>
+        <button
+          type="button"
+          onClick={start}
+          disabled={frozen}
+          className="flex items-center gap-2.5 rounded-l-[12px] px-5 transition-colors hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+        >
+          <TimerIcon size={18} />
+          Start timer
+        </button>
+        <span className="relative flex items-center border-l-2 border-ink">
+          <select
+            value={seconds}
+            onChange={(e) => onChangeSeconds(Number(e.target.value))}
+            disabled={frozen}
+            aria-label="Timer length for this question"
+            className="h-full cursor-pointer appearance-none rounded-r-[12px] bg-transparent pl-4 pr-9 font-display font-extrabold tabular-nums outline-none transition-colors hover:bg-surface-soft focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+          >
+            <option value="0">No timer</option>
+            {timerOptions(seconds).map((s) => (
+              <option key={s} value={s}>
+                {formatClock(s)}
+              </option>
+            ))}
+          </select>
+          <svg
+            className="pointer-events-none absolute right-3 text-ink-soft"
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            aria-hidden
+          >
+            <path d="M3 4.5l3 3 3-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </div>
     );
   }
 

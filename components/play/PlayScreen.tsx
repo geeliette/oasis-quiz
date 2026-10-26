@@ -104,6 +104,21 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
     setActiveClueId(null);
   }
 
+  // Saved to the question, as if set in the editor. Picking the board's
+  // default goes back to following it.
+  function handleClueTimeLimit(seconds: number) {
+    if (!activeClueId) return;
+    const { categoryId, clueId } = activeClueId;
+    const timeLimit = seconds === (initialGame.defaultTimeLimit ?? 0) ? undefined : seconds;
+    setCategories((cs) =>
+      cs.map((c) =>
+        c.id !== categoryId
+          ? c
+          : { ...c, clues: c.clues.map((cl) => (cl.id === clueId ? { ...cl, timeLimit } : cl)) }
+      )
+    );
+  }
+
   function handleRestartBoard() {
     setCategories((cs) =>
       cs.map((c) => ({
@@ -259,6 +274,7 @@ export function PlayScreen({ initialGame }: { initialGame: Game }) {
           clue={activeClue}
           timeLimit={effectiveTimeLimit(activeClue, initialGame)}
           teams={teams}
+          onTimeLimitChange={handleClueTimeLimit}
           onAward={handleAward}
           onClose={handleCloseClue}
           onCancel={handleCancelClue}
